@@ -1,4 +1,4 @@
-;
+'use strict';
 // license: https://mit-license.org
 // =============================================================================
 // The MIT License (MIT)
@@ -30,32 +30,23 @@
 
 //! require <crypto.js>
 
-(function (ns) {
-    'use strict';
-
-    var Class = ns.type.Class;
-    var DataDigester = ns.digest.DataDigester;
-
     //
     //  RIPEMD160
     //
-    var hash = function () {
-        Object.call(this);
+    mk.digest.RIPEMD160Digester = function () {
+        BaseObject.call(this);
     };
-    Class(hash, Object, [DataDigester], {
+    var RIPEMD160Digester = mk.digest.RIPEMD160Digester;
+
+    Class(RIPEMD160Digester, BaseObject, [DataDigester], {
 
         // Override
         digest: function (data) {
             // bytes2words
-            var hex = ns.format.Hex.encode(data);
+            var hex = Hex.encode(data);
             var array = CryptoJS.enc.Hex.parse(hex);
             var result = CryptoJS.RIPEMD160(array);
             // words2bytes
-            return ns.format.Hex.decode(result.toString());
+            return Hex.decode(result.toString());
         }
     });
-
-    //-------- namespace --------
-    ns.digest.RIPEMD160.setDigester(new hash());
-
-})(DIMP);

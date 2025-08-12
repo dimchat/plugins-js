@@ -1,4 +1,4 @@
-;
+'use strict';
 // license: https://mit-license.org
 // =============================================================================
 // The MIT License (MIT)
@@ -30,32 +30,23 @@
 
 //! require <crypto.js>
 
-(function (ns) {
-    'use strict';
-
-    var Class = ns.type.Class;
-    var DataDigester = ns.digest.DataDigester;
-
     //
     //  SHA256
     //
-    var hash = function () {
-        Object.call(this);
+    mk.digest.SHA256Digester = function () {
+        BaseObject.call(this);
     };
-    Class(hash, Object, [DataDigester], {
+    var SHA256Digester = mk.digest.SHA256Digester;
+
+    Class(SHA256Digester, BaseObject, [DataDigester], {
 
         // Override
         digest: function (data) {
             // bytes2words
-            var hex = ns.format.Hex.encode(data);
+            var hex = Hex.encode(data);
             var array = CryptoJS.enc.Hex.parse(hex);
             var result = CryptoJS.SHA256(array);
             // words2bytes
-            return ns.format.Hex.decode(result.toString());
+            return Hex.decode(result.toString());
         }
     });
-
-    //-------- namespace --------
-    ns.digest.SHA256.setDigester(new hash());
-
-})(DIMP);
