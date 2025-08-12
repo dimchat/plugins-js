@@ -33,16 +33,12 @@
 //! require 'json2.js' (https://github.com/douglascrockford/JSON-js)
 //! require 'coder.js'
 
-(function (ns) {
-    'use strict';
-
-    var Class = ns.type.Class;
-    var ObjectCoder = ns.format.ObjectCoder;
-
-    var JsonCoder = function () {
-        Object.call(this);
+    mk.format.JSONCoder = function () {
+        BaseObject.call(this);
     };
-    Class(JsonCoder, Object, [ObjectCoder], {
+    var JSONCoder = mk.format.JSONCoder;
+
+    Class(JSONCoder, BaseObject, [ObjectCoder], {
 
         // Override
         encode: function (object) {
@@ -54,8 +50,3 @@
             return JSON.parse(string);
         }
     });
-
-    //-------- namespace --------//
-    ns.format.JSON.setCoder(new JsonCoder());
-
-})(DIMP);

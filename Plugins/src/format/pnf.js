@@ -32,19 +32,10 @@
 
 //! require <crypto.js>
 
-(function (ns) {
-    'use strict';
-
-    var Class      = ns.type.Class;
-    var Dictionary = ns.type.Dictionary;
-    var JsON       = ns.format.JSON;
-
-    var PortableNetworkFile = ns.format.PortableNetworkFile;
-    var BaseFileWrapper     = ns.format.BaseFileWrapper;
 
     //  1. new BaseNetworkFile(dict);
     //  2. new BaseNetworkFile(data, filename, url, password);
-    var BaseNetworkFile = function () {
+    mk.format.BaseNetworkFile = function () {
         var ted = null, filename = null, url = null, password = null;
         if (arguments.length === 1) {
             // new BaseNetworkFile(dict);
@@ -78,6 +69,8 @@
         }
         this.__wrapper = wrapper;
     };
+    var BaseNetworkFile = mk.format.BaseNetworkFile;
+
     Class(BaseNetworkFile, Dictionary, [PortableNetworkFile], {
 
         // Override
@@ -133,7 +126,7 @@
                 return url;
             }
             // not a single URL, encode the entire dictionary
-            return JsON.encode(this.toMap());
+            return JSONMap.encode(this.toMap());
         },
 
         // Override
@@ -171,10 +164,12 @@
         }
     });
 
-    var BaseNetworkFileFactory = function () {
-        Object.call(this);
+    mk.format.BaseNetworkFileFactory = function () {
+        BaseObject.call(this);
     };
-    Class(BaseNetworkFileFactory, Object, [PortableNetworkFile.Factory], {
+    var BaseNetworkFileFactory = mk.format.BaseNetworkFileFactory;
+
+    Class(BaseNetworkFileFactory, BaseObject, [PortableNetworkFile.Factory], {
 
         // Override
         createPortableNetworkFile: function (ted, filename, url, password) {
@@ -183,15 +178,13 @@
 
         // Override
         parsePortableNetworkFile: function (pnf) {
+            // check 'data', 'URL', 'filename'
+            if (pnf['data'] || pnf['URL'] || pnf['filename']) {
+                // OK
+            } else {
+                // pnf.data and pnf.URL and pnf.filename should not be empty at the same time
+                return null;
+            }
             return new BaseNetworkFile(pnf);
         }
     });
-
-    /**
-     *  Register PNF factory
-     *  ~~~~~~~~~~~~~~~~~~~~
-     */
-    var factory = new BaseNetworkFileFactory();
-    PortableNetworkFile.setFactory(factory);
-
-})(DIMP);

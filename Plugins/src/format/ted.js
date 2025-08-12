@@ -31,19 +31,11 @@
 //
 
 //! require <crypto.js>
-
-(function (ns) {
-    'use strict';
-
-    var Class      = ns.type.Class;
-    var Dictionary = ns.type.Dictionary;
-
-    var TransportableData = ns.format.TransportableData;
-    var BaseDataWrapper   = ns.format.BaseDataWrapper;
+//! require <dimp.js>
 
     //  1. new Base64Data(dict);
     //  2. new Base64Data(data);
-    var Base64Data = function (info) {
+    mk.format.Base64Data = function (info) {
         var binary = null;
         if (info instanceof Uint8Array) {
             binary = info;
@@ -53,7 +45,7 @@
         var wrapper = new BaseDataWrapper(this.toMap());
         if (binary) {
             // encode algorithm
-            wrapper.setAlgorithm(TransportableData.BASE64);
+            wrapper.setAlgorithm(EncodeAlgorithms.BASE_64);
             // binary data
             if (binary.length > 0) {
                 wrapper.setData(binary);
@@ -61,6 +53,8 @@
         }
         this.__wrapper = wrapper;
     };
+    var Base64Data = mk.format.Base64Data;
+
     Class(Base64Data, Dictionary, [TransportableData], {
 
         // Override
@@ -90,11 +84,16 @@
             return this.__wrapper.encode(mimeType);
         }
     });
-    
-    var Base64DataFactory = function () {
-        Object.call(this);
+
+    //
+    //  Base 64
+    //
+    mk.format.Base64DataFactory = function () {
+        BaseObject.call(this);
     };
-    Class(Base64DataFactory, Object, [TransportableData.Factory], {
+    var Base64DataFactory = mk.format.Base64DataFactory;
+
+    Class(Base64DataFactory, BaseObject, [TransportableData.Factory], {
         
         // Override
         createTransportableData: function (data) {
@@ -103,19 +102,15 @@
 
         // Override
         parseTransportableData: function (ted) {
+            // check 'data'
+            if (ted['data']) {
+                // OK
+            } else {
+                // ted.data should not be empty
+                return null;
+            }
             // TODO: 1. check algorithm
             //       2. check data format
             return new Base64Data(ted);
         }
     });
-
-    /**
-     *  Register TED factory
-     *  ~~~~~~~~~~~~~~~~~~~~
-     */
-    var factory = new Base64DataFactory();
-    TransportableData.setFactory('*', factory);
-    TransportableData.setFactory(TransportableData.BASE64, factory);
-    // TransportableData.setFactory(TransportableData.DEFAULT, factory);
-
-})(DIMP);

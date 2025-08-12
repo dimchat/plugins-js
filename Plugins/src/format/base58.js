@@ -27,29 +27,26 @@
 
 //! require <crypto.js>
 
-(function (ns) {
-    'use strict';
-
     //
     //  Patch for String.repeat()
     //
-    var repeat = function (count) {
-        var string = '';
+    var string_repeat = function (count) {
+        var text = '';
         for (var i = 0; i < count; ++i) {
-            string += this;
+            text += this;
         }
-        return string;
+        return text;
     };
-    if (typeof String.prototype.repeat !== 'function') {
-        String.prototype.repeat = repeat;
-    }
+    // if (typeof String.prototype.repeat !== 'function') {
+    //     String.prototype.repeat = string_repeat;
+    // }
 
     //-------- Base algorithm begin --------
     //
     //  See: https://github.com/cryptocoinjs/base-x
     //
 
-    function base(ALPHABET) {
+    function base_chars(ALPHABET) {
         if (ALPHABET.length >= 255) {
             throw new TypeError("Alphabet too long")
         }
@@ -103,7 +100,7 @@
             while (it2 !== size && b58[it2] === 0) {
                 it2++
             }
-            var str = repeat.call(LEADER, zeroes);
+            var str = string_repeat.call(LEADER, zeroes);
             for (; it2 < size; ++it2) {
                 str += ALPHABET.charAt(b58[it2])
             }
@@ -178,20 +175,19 @@
             decode: decode
         }
     }
-    var bs58 = base('123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz');
+    var bs58 = base_chars('123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz');
 
     //-------- Base algorithm end --------
-
-    var Class = ns.type.Class;
-    var DataCoder = ns.format.DataCoder;
 
     //
     //  Base58
     //
-    var Base58Coder = function () {
-        Object.call(this);
+    mk.format.Base58Coder = function () {
+        BaseObject.call(this);
     };
-    Class(Base58Coder, Object, [DataCoder], {
+    var Base58Coder = mk.format.Base58Coder;
+
+    Class(Base58Coder, BaseObject, [DataCoder], {
 
         // Override
         encode: function (data) {
@@ -203,8 +199,3 @@
             return bs58.decode(string);
         }
     });
-
-    //-------- namespace --------
-    ns.format.Base58.setCoder(new Base58Coder());
-
-})(DIMP);

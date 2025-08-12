@@ -32,9 +32,6 @@
 
 //! require 'coder.js'
 
-(function (ns) {
-    'use strict';
-
     //-------- HEX algorithm begin --------
     var hex_chars = '0123456789abcdef';
     var hex_values = new Int8Array(128);
@@ -104,13 +101,12 @@
     };
     //-------- HEX algorithm end --------
 
-    var Class = ns.type.Class;
-    var DataCoder = ns.format.DataCoder;
-
-    var HexCoder = function () {
-        Object.call(this);
+    mk.format.HexCoder = function () {
+        BaseObject.call(this);
     };
-    Class(HexCoder, Object, [DataCoder], {
+    var HexCoder = mk.format.HexCoder;
+
+    Class(HexCoder, BaseObject, [DataCoder], {
 
         // Override
         encode: function (data) {
@@ -122,8 +118,3 @@
             return hex_decode(string);
         }
     });
-
-    //-------- namespace --------
-    ns.format.Hex.setCoder(new HexCoder());
-
-})(DIMP);

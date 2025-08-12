@@ -32,9 +32,6 @@
 
 //! require <crypto.js>
 
-(function (ns) {
-    'use strict';
-
     //-------- UTF-8 algorithm begin --------
     /**
      *  Encode string to UTF8 data array
@@ -127,13 +124,12 @@
     };
     //-------- UTF-8 algorithm end --------
 
-    var Class = ns.type.Class;
-    var StringCoder = ns.format.StringCoder;
-
-    var Utf8Coder = function () {
-        Object.call(this);
+    mk.format.UTF8Coder = function () {
+        BaseObject.call(this);
     };
-    Class(Utf8Coder, Object, [StringCoder], {
+    var UTF8Coder = mk.format.UTF8Coder;
+
+    Class(UTF8Coder, BaseObject, [StringCoder], {
 
         // Override
         encode: function (string) {
@@ -145,8 +141,3 @@
             return utf8_decode(data);
         }
     })
-
-    //-------- namespace --------
-    ns.format.UTF8.setCoder(new Utf8Coder());
-
-})(DIMP);
