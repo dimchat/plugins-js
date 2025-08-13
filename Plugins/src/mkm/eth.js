@@ -1,4 +1,4 @@
-;
+'use strict';
 // license: https://mit-license.org
 //
 //  Ming-Ke-Ming : Decentralized User Identity Authentication
@@ -32,14 +32,6 @@
 
 //! require <mkm.js>
 
-(function (ns) {
-    'use strict';
-
-    var Class          = ns.type.Class;
-    var ConstantString = ns.type.ConstantString;
-    var EntityType     = ns.protocol.EntityType;
-    var Address        = ns.protocol.Address;
-
     /**
      *  Address like Ethereum
      *
@@ -50,15 +42,20 @@
      *          digest      = keccak256(fingerprint);
      *          address     = hex_encode(digest.suffix(20));
      */
-    var ETHAddress = function (string) {
+    mkm.mkm.ETHAddress = function (string) {
         ConstantString.call(this, string);
     };
-    Class(ETHAddress, ConstantString, [Address], null);
+    var ETHAddress = mkm.mkm.ETHAddress;
 
-    // Override
-    ETHAddress.prototype.getType = function () {
-        return EntityType.USER.getValue();
-    };
+    Class(ETHAddress, ConstantString, [Address], {
+
+        // Override
+        getType: function () {
+            return EntityType.USER.getValue();
+        }
+
+    });
+
 
     ETHAddress.getValidateAddress = function (address) {
         if (!is_eth(address)) {
@@ -85,10 +82,10 @@
             throw new TypeError('ECC key data error: ' + fingerprint);
         }
         // 1. digest = keccak256(fingerprint);
-        var digest = ns.digest.KECCAK256.digest(fingerprint);
+        var digest = Keccak256.digest(fingerprint);
         // 2. address = hex_encode(digest.suffix(20));
         var tail = digest.subarray(digest.length - 20);
-        var address = ns.format.Hex.encode(tail);
+        var address = Hex.encode(tail);
         return new ETHAddress('0x' + eip55(address));
     };
 
@@ -109,7 +106,7 @@
     // https://eips.ethereum.org/EIPS/eip-55
     var eip55 = function (hex) {
         var sb = new Uint8Array(40);
-        var hash = ns.digest.KECCAK256.digest(ns.format.UTF8.encode(hex));
+        var hash = Keccak256.digest(UTF8.encode(hex));
         var ch;
         var _9 = '9'.charCodeAt(0);
         for (var i = 0; i < 40; ++i) {
@@ -122,7 +119,7 @@
             }
             sb[i] = ch;
         }
-        return ns.format.UTF8.decode(sb);
+        return UTF8.decode(sb);
     };
 
     var is_eth = function (address) {
@@ -131,12 +128,6 @@
         } else if (address.charAt(0) !== '0' || address.charAt(1) !== 'x') {
             return false;
         }
-        var _0 = '0'.charCodeAt(0);
-        var _9 = '9'.charCodeAt(0);
-        var _A = 'A'.charCodeAt(0);
-        var _Z = 'Z'.charCodeAt(0);
-        var _a = 'a'.charCodeAt(0);
-        var _z = 'z'.charCodeAt(0);
         var ch;
         for (var i = 2; i < 42; ++i) {
             ch = address.charCodeAt(i);
@@ -154,8 +145,9 @@
         }
         return true;
     };
-
-    //-------- namespace --------
-    ns.mkm.ETHAddress = ETHAddress;
-
-})(DIMP);
+    var _0 = '0'.charCodeAt(0);
+    var _9 = '9'.charCodeAt(0);
+    var _A = 'A'.charCodeAt(0);
+    var _Z = 'Z'.charCodeAt(0);
+    var _a = 'a'.charCodeAt(0);
+    var _z = 'z'.charCodeAt(0);

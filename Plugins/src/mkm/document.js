@@ -1,4 +1,4 @@
-;
+'use strict';
 // license: https://mit-license.org
 //
 //  Ming-Ke-Ming : Decentralized User Identity Authentication
@@ -32,88 +32,79 @@
 
 //! require <dimp.js>
 
-(function (ns) {
-    'use strict';
+    /**
+     *  General Document Factory
+     *  ~~~~~~~~~~~~~~~~~~~~~~~~
+     */
+    mkm.mkm.GeneralDocumentFactory = function (type) {
+        BaseObject.call(this);
+        this.__type = type;
+    };
+    var GeneralDocumentFactory = mkm.mkm.GeneralDocumentFactory;
 
-    var Class        = ns.type.Class;
-    var ID           = ns.protocol.ID;
-    var Document     = ns.protocol.Document;
-    var BaseDocument = ns.mkm.BaseDocument;
-    var BaseBulletin = ns.mkm.BaseBulletin;
-    var BaseVisa     = ns.mkm.BaseVisa;
+    Class(GeneralDocumentFactory, BaseObject, [DocumentFactory], null);
 
-    var doc_type = function (type, identifier) {
-        if (type !== '*') {
-            return type;
+    // protected
+    GeneralDocumentFactory.prototype.getType = function (docType, identifier) {
+        if (!identifier) {
+            return this.__type;
+        } else if (docType !== null && docType !== '' && docType !== '*') {
+            return docType;
         } else if (identifier.isGroup()) {
-            return Document.BULLETIN;
+            return DocumentType.BULLETIN;
         } else if (identifier.isUser()) {
-            return Document.VISA;
+            return DocumentType.VISA;
         } else {
-            return Document.PROFILE;
+            return DocumentType.PROFILE;
         }
     };
 
-    /**
-     *  General Document factory
-     *  ~~~~~~~~~~~~~~~~~~~~~~~~
-     */
-    var GeneralDocumentFactory = function (type) {
-        Object.call(this);
-        this.__type = type;
-    };
-    Class(GeneralDocumentFactory, Object, [Document.Factory], null);
-
     // Override
     GeneralDocumentFactory.prototype.createDocument = function(identifier, data, signature) {
-        var type = doc_type(this.__type, identifier);
+        var type = this.getType(this.__type, identifier);
         if (data && signature) {
             // create document with data & signature from local storage
-            if (type === Document.VISA) {
+            if (type === DocumentType.VISA) {
                 return new BaseVisa(identifier, data, signature)
-            } else if (type === Document.BULLETIN) {
+            } else if (type === DocumentType.BULLETIN) {
                 return new BaseBulletin(identifier, data, signature)
             } else {
-                return new BaseDocument(identifier, data, signature)
+                return new BaseDocument(type, identifier, data, signature)
             }
         } else {
             // create empty document
-            if (type === Document.VISA) {
+            if (type === DocumentType.VISA) {
                 return new BaseVisa(identifier)
-            } else if (type === Document.BULLETIN) {
+            } else if (type === DocumentType.BULLETIN) {
                 return new BaseBulletin(identifier)
             } else {
-                return new BaseDocument(identifier, type)
+                return new BaseDocument(type, identifier)
             }
         }
     };
 
     // Override
     GeneralDocumentFactory.prototype.parseDocument = function(doc) {
-        var identifier = ID.parse(doc['ID']);
+        var identifier = ID.parse(doc['did']);
         if (!identifier) {
             return null;
+        } else if (doc['data'] && doc['signature']) {
+            // OK
+        } else {
+            // doc.data should not be empty
+            // doc.signature should not be empty
+            return null;
         }
-        var gf = general_factory();
-        var type = gf.getDocumentType(doc, null);
+        var helper = SharedAccountExtensions.getHelper();
+        var type = helper.getDocumentType(doc, null);
         if (!type) {
-            type = doc_type('*', identifier);
+            type = this.getType('*', identifier);
         }
-        if (type === Document.VISA) {
+        if (type === DocumentType.VISA) {
             return new BaseVisa(doc);
-        } else if (type === Document.BULLETIN) {
+        } else if (type === DocumentType.BULLETIN) {
             return new BaseBulletin(doc);
         } else {
             return new BaseDocument(doc);
         }
     };
-
-    var general_factory = function () {
-        var man = ns.mkm.AccountFactoryManager;
-        return man.generalFactory;
-    };
-
-    //-------- namespace --------
-    ns.mkm.GeneralDocumentFactory = GeneralDocumentFactory;
-
-})(DIMP);

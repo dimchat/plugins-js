@@ -1,4 +1,4 @@
-;
+'use strict';
 // license: https://mit-license.org
 //
 //  Ming-Ke-Ming : Decentralized User Identity Authentication
@@ -30,6 +30,10 @@
 // =============================================================================
 //
 
+//! require <dimp.js>
+//! require 'btc.js'
+//! require 'eth.js'
+
 /**
  *  Default Meta to build ID with 'name@address'
  *
@@ -37,24 +41,11 @@
  *      0x01 - MKM
  *
  *  algorithm:
- *      CT      = fingerprint; // or key.data for BTC address
+ *      CT      = fingerprint = sKey.sign(seed);
  *      hash    = ripemd160(sha256(CT));
  *      code    = sha256(sha256(network + hash)).prefix(4);
  *      address = base58_encode(network + hash + code);
- *      number  = uint(code);
  */
-
-//! require <mkm.js>
-//! require 'btc.js'
-//! require 'eth.js'
-
-(function (ns) {
-    'use strict';
-
-    var Class      = ns.type.Class;
-    var Enum       = ns.type.Enum;
-    var BTCAddress = ns.mkm.BTCAddress;
-    var BaseMeta   = ns.mkm.BaseMeta;
 
     /**
      *  Create default meta
@@ -63,7 +54,7 @@
      *      1. new DefaultMeta(map);
      *      2. new DefaultMeta(type, key, seed, fingerprint);
      */
-    var DefaultMeta = function () {
+    mkm.mkm.DefaultMeta = function () {
         if (arguments.length === 1) {
             // new DefaultMeta(map);
             BaseMeta.call(this, arguments[0]);
@@ -76,6 +67,8 @@
         // memory cache
         this.__addresses = {};  // uint -> Address
     };
+    var DefaultMeta = mkm.mkm.DefaultMeta;
+
     Class(DefaultMeta, BaseMeta, null, {
 
         // Override
@@ -85,7 +78,6 @@
 
         // Override
         generateAddress: function (network) {
-            network = Enum.getInt(network);
             // check cache
             var cached = this.__addresses[network];
             if (!cached) {
@@ -98,17 +90,12 @@
         }
     });
 
-    //-------- namespace --------
-    ns.mkm.DefaultMeta = DefaultMeta;
-
-})(DIMP);
 
 /**
  *  Meta to build BTC address for ID
  *
  *  version:
  *      0x02 - BTC
- *      0x03 - ExBTC
  *
  *  algorithm:
  *      CT      = key.data;
@@ -116,14 +103,6 @@
  *      code    = sha256(sha256(network + hash)).prefix(4);
  *      address = base58_encode(network + hash + code);
  */
-
-(function (ns) {
-    'use strict';
-
-    var Class      = ns.type.Class;
-    var Enum       = ns.type.Enum;
-    var BTCAddress = ns.mkm.BTCAddress;
-    var BaseMeta   = ns.mkm.BaseMeta;
 
     /**
      *  Create meta for BTC address
@@ -133,7 +112,7 @@
      *      2. new BTCMeta(type, key);
      *      3. new BTCMeta(type, key, seed, fingerprint);
      */
-    var BTCMeta = function () {
+    mkm.mkm.BTCMeta = function () {
         if (arguments.length === 1) {
             // new BTCMeta(map);
             BaseMeta.call(this, arguments[0]);
@@ -149,6 +128,8 @@
         // memory cache
         this.__addresses = {};  // uint -> Address
     };
+    var BTCMeta = mkm.mkm.BTCMeta;
+
     Class(BTCMeta, BaseMeta, null, {
 
         // Override
@@ -158,7 +139,6 @@
 
         // Override
         generateAddress: function (network) {
-            network = Enum.getInt(network);
             // check cache
             var cached = this.__addresses[network];
             if (!cached) {
@@ -173,30 +153,18 @@
         }
     });
 
-    //-------- namespace --------
-    ns.mkm.BTCMeta = BTCMeta;
-
-})(DIMP);
 
 /**
  *  Meta to build ETH address for ID
  *
  *  version:
  *      0x04 - ETH
- *      0x05 - ExETH
  *
  *  algorithm:
  *      CT      = key.data;  // without prefix byte
  *      digest  = keccak256(CT);
  *      address = hex_encode(digest.suffix(20));
  */
-
-(function (ns) {
-    'use strict';
-
-    var Class      = ns.type.Class;
-    var ETHAddress = ns.mkm.ETHAddress;
-    var BaseMeta   = ns.mkm.BaseMeta;
 
     /**
      *  Create meta for ETH address
@@ -206,7 +174,7 @@
      *      2. new BTCMeta(type, key);
      *      3. new BTCMeta(type, key, seed, fingerprint);
      */
-    var ETHMeta = function () {
+    mkm.mkm.ETHMeta = function () {
         if (arguments.length === 1) {
             // new ETHMeta(map);
             BaseMeta.call(this, arguments[0]);
@@ -222,6 +190,8 @@
         // memory cache
         this.__address = null;  // cached address
     };
+    var ETHMeta = mkm.mkm.ETHMeta;
+
     Class(ETHMeta, BaseMeta, null, {
 
         // Override
@@ -245,42 +215,30 @@
         }
     });
 
-    //-------- namespace --------
-    ns.mkm.ETHMeta = ETHMeta;
-
-})(DIMP);
-
-(function (ns) {
-    'use strict';
-
-    var Class             = ns.type.Class;
-    var UTF8              = ns.format.UTF8;
-    var TransportableData = ns.format.TransportableData;
-    var Meta              = ns.protocol.Meta;
-    var DefaultMeta       = ns.mkm.DefaultMeta;
-    var BTCMeta           = ns.mkm.BTCMeta;
-    var ETHMeta           = ns.mkm.ETHMeta;
 
     /**
-     *  General Meta factory
-     *  ~~~~~~~~~~~~~~~~~~~~
+     *  Base Meta Factory
+     *  ~~~~~~~~~~~~~~~~~
      */
-    var GeneralMetaFactory = function (algorithm) {
-        Object.call(this);
+    mkm.mkm.BaseMetaFactory = function (algorithm) {
+        BaseObject.call(this);
         this.__type = algorithm;
     };
-    Class(GeneralMetaFactory, Object, [Meta.Factory], null);
+    var BaseMetaFactory = mkm.mkm.BaseMetaFactory;
+
+    Class(BaseMetaFactory, BaseObject, [MetaFactory], null);
 
     // protected
-    GeneralMetaFactory.prototype.getType = function () {
+    BaseMetaFactory.prototype.getType = function () {
         return this.__type;
     };
 
     // Override
-    GeneralMetaFactory.prototype.generateMeta = function(sKey, seed) {
+    BaseMetaFactory.prototype.generateMeta = function(sKey, seed) {
         var fingerprint = null;  // TransportableData
         if (seed && seed.length > 0) {
-            var sig = sKey.sign(UTF8.encode(seed));
+            var data = UTF8.encode(seed);
+            var sig = sKey.sign(data);
             fingerprint = TransportableData.create(sig);
         }
         var pKey = sKey.getPublicKey();
@@ -288,18 +246,18 @@
     };
 
     // Override
-    GeneralMetaFactory.prototype.createMeta = function(key, seed, fingerprint) {
+    BaseMetaFactory.prototype.createMeta = function(pKey, seed, fingerprint) {
         var out;
         var type = this.getType();
-        if (type === Meta.MKM) {
+        if (type === MetaType.MKM || 'mkm' === type) {
             // MKM
-            out = new DefaultMeta(type, key, seed, fingerprint);
-        } else if (type === Meta.BTC) {
+            out = new DefaultMeta(type, pKey, seed, fingerprint);
+        } else if (type === MetaType.BTC || 'btc' === type) {
             // BTC
-            out = new BTCMeta(type, key);
-        } else if (type === Meta.ETH) {
+            out = new BTCMeta(type, pKey);
+        } else if (type === MetaType.ETH || 'eth' === type) {
             // ETH
-            out = new ETHMeta(type, key);
+            out = new ETHMeta(type, pKey);
         } else {
             // unknown type
             throw new TypeError('unknown meta type: ' + type);
@@ -308,17 +266,17 @@
     };
 
     // Override
-    GeneralMetaFactory.prototype.parseMeta = function(meta) {
+    BaseMetaFactory.prototype.parseMeta = function(meta) {
         var out;
-        var gf = general_factory();
-        var type = gf.getMetaType(meta, '');
-        if (type === Meta.MKM) {
+        var helper = SharedAccountExtensions.getHelper();
+        var type = helper.getMetaType(meta, '');
+        if (type === MetaType.MKM || 'mkm' === type) {
             // MKM
             out = new DefaultMeta(meta);
-        } else if (type === Meta.BTC) {
+        } else if (type === MetaType.BTC || 'btc' === type) {
             // BTC
             out = new BTCMeta(meta);
-        } else if (type === Meta.ETH) {
+        } else if (type === MetaType.ETH || 'eth' === type) {
             // ETH
             out = new ETHMeta(meta);
         } else {
@@ -327,13 +285,3 @@
         }
         return out.isValid() ? out : null;
     };
-
-    var general_factory = function () {
-        var man = ns.mkm.AccountFactoryManager;
-        return man.generalFactory;
-    };
-
-    //-------- namespace --------
-    ns.mkm.GeneralMetaFactory = GeneralMetaFactory;
-
-})(DIMP);

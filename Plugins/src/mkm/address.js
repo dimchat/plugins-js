@@ -1,4 +1,4 @@
-;
+'use strict';
 // license: https://mit-license.org
 //
 //  Ming-Ke-Ming : Decentralized User Identity Authentication
@@ -30,114 +30,70 @@
 // =============================================================================
 //
 
-//! require <crypto.js>
 //! require <mkm.js>
-
-(function (ns) {
-    'use strict';
-
-    var Class   = ns.type.Class;
-    var Address = ns.protocol.Address;
 
     /**
      *  Base Address Factory
      *  ~~~~~~~~~~~~~~~~~~~~
      */
-    var BaseAddressFactory = function () {
-        Object.call(this);
-        this.__addresses = {};  // string -> Address
+    mkm.mkm.BaseAddressFactory = function () {
+        BaseObject.call(this);
+        this._addresses = {};  // string -> Address
     };
-    Class(BaseAddressFactory, Object, [Address.Factory], null);
+    var BaseAddressFactory = mkm.mkm.BaseAddressFactory;
 
-    /**
-     * Call it when received 'UIApplicationDidReceiveMemoryWarningNotification',
-     * this will remove 50% of cached objects
-     *
-     * @return number of survivors
-     */
-    BaseAddressFactory.prototype.reduceMemory = function () {
-        var finger = 0;
-        finger = thanos(this.__addresses, finger);
-        return finger >> 1;
-    };
+    Class(BaseAddressFactory, BaseObject, [AddressFactory], null);
 
     // Override
     BaseAddressFactory.prototype.generateAddress = function (meta, network) {
         var address = meta.generateAddress(network);
         if (address) {
-            this.__addresses[address.toString()] = address;
+            this._addresses[address.toString()] = address;
         }
         return address;
     };
 
     // Override
     BaseAddressFactory.prototype.parseAddress = function (string) {
-        var address = this.__addresses[string];
+        var address = this._addresses[string];
         if (!address) {
-            address = Address.create(string);
+            address = this.parse(string);
             if (address) {
-                this.__addresses[string] = address;
+                this._addresses[string] = address;
             }
         }
         return address;
     };
 
     /**
-     *  Remove 1/2 objects from the dictionary
-     *  (Thanos can kill half lives of a world with a snap of the finger)
+     *  Create address from string
      *
-     * @param {{}} planet
-     * @param {Number} finger
-     * @returns {Number} number of survivors
+     * @param {string} string
+     * @return {Address}
      */
-    var thanos = ns.mkm.thanos;
-
-    //-------- namespace --------
-    ns.mkm.BaseAddressFactory = BaseAddressFactory;
-
-})(DIMP);
-
-(function (ns) {
-    'use strict';
-
-    var Class              = ns.type.Class;
-    var Address            = ns.protocol.Address;
-    var BaseAddressFactory = ns.mkm.BaseAddressFactory;
-    var BTCAddress         = ns.mkm.BTCAddress;
-    var ETHAddress         = ns.mkm.ETHAddress;
-
-    /**
-     *  General Address Factory
-     *  ~~~~~~~~~~~~~~~~~~~~~~~
-     */
-    var GeneralAddressFactory = function () {
-        BaseAddressFactory.call(this);
-    };
-    Class(GeneralAddressFactory, BaseAddressFactory, null, null);
-
-    // Override
-    GeneralAddressFactory.prototype.createAddress = function(address) {
-        if (!address) {
+    // protected
+    BaseAddressFactory.prototype.parse = function (string) {
+        if (!string) {
             //throw new ReferenceError('address empty');
             return null;
         }
-        var len = address.length;
+        var len = string.length;
         if (len === 8) {
             // "anywhere"
-            if (address.toLowerCase() === 'anywhere') {
+            if (string.toLowerCase() === 'anywhere') {
                 return Address.ANYWHERE;
             }
         } else if (len === 10) {
             // "everywhere"
-            if (address.toLowerCase() === 'everywhere') {
+            if (string.toLowerCase() === 'everywhere') {
                 return Address.EVERYWHERE;
             }
         }
         var res;
         if (26 <= len && len <= 35) {
-            res = BTCAddress.parse(address);
+            res = BTCAddress.parse(string);
         } else if (len === 42) {
-            res = ETHAddress.parse(address);
+            res = ETHAddress.parse(string);
         } else {
             //throw new TypeError('invalid address: ' + address);
             res = null;
@@ -145,8 +101,3 @@
         // TODO: other types of address
         return res;
     };
-
-    //-------- namespace --------
-    ns.mkm.GeneralAddressFactory = GeneralAddressFactory;
-
-})(DIMP);

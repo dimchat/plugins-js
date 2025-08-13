@@ -1,4 +1,4 @@
-;
+'use strict';
 // license: https://mit-license.org
 //
 //  Ming-Ke-Ming : Decentralized User Identity Authentication
@@ -30,38 +30,19 @@
 // =============================================================================
 //
 
-//! require <crypto.js>
 //! require <mkm.js>
-
-(function (ns) {
-    'use strict';
-
-    var Class      = ns.type.Class;
-    var Address    = ns.protocol.Address;
-    var ID         = ns.protocol.ID;
-    var Identifier = ns.mkm.Identifier;
 
     /**
      *  General Identifier Factory
      *  ~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
-    var IdentifierFactory = function () {
-        Object.call(this);
-        this.__identifiers = {};  // string -> ID
+    mkm.mkm.IdentifierFactory = function () {
+        BaseObject.call(this);
+        this._identifiers = {};  // string -> ID
     };
-    Class(IdentifierFactory, Object, [ID.Factory], null);
+    var IdentifierFactory = mkm.mkm.IdentifierFactory;
 
-    /**
-     * Call it when received 'UIApplicationDidReceiveMemoryWarningNotification',
-     * this will remove 50% of cached objects
-     *
-     * @return number of survivors
-     */
-    IdentifierFactory.prototype.reduceMemory = function () {
-        var finger = 0;
-        finger = thanos(this.__identifiers, finger);
-        return finger >> 1;
-    };
+    Class(IdentifierFactory, BaseObject, [IDFactory], null);
 
     // Override
     IdentifierFactory.prototype.generateIdentifier = function (meta, network, terminal) {
@@ -72,24 +53,24 @@
     // Override
     IdentifierFactory.prototype.createIdentifier = function (name, address, terminal) {
         var string = Identifier.concat(name, address, terminal);
-        var id = this.__identifiers[string];
-        if (!id) {
-            id = this.newID(string, name, address, terminal);
-            this.__identifiers[string] = id;
+        var did = this._identifiers[string];
+        if (!did) {
+            did = this.newID(string, name, address, terminal);
+            this._identifiers[string] = did;
         }
-        return id;
+        return did;
     }
 
     // Override
     IdentifierFactory.prototype.parseIdentifier = function (identifier) {
-        var id = this.__identifiers[identifier];
-        if (!id) {
-            id = this.parse(identifier);
-            if (id) {
-                this.__identifiers[identifier] = id;
+        var did = this._identifiers[identifier];
+        if (!did) {
+            did = this.parse(identifier);
+            if (did) {
+                this._identifiers[identifier] = did;
             }
         }
-        return id;
+        return did;
     };
 
     // protected
@@ -102,7 +83,7 @@
     /**
      *  Parse ID from string
      *
-     * @param {String} string
+     * @param {string} string
      * @return {Identifier}
      */
     IdentifierFactory.prototype.parse = function (string) {
@@ -131,18 +112,3 @@
         }
         return this.newID(string, name, address, terminal);
     };
-
-    /**
-     *  Remove 1/2 objects from the dictionary
-     *  (Thanos can kill half lives of a world with a snap of the finger)
-     *
-     * @param {{}} planet
-     * @param {Number} finger
-     * @returns {Number} number of survivors
-     */
-    var thanos = ns.mkm.thanos;
-
-    //-------- namespace --------
-    ns.mkm.GeneralIdentifierFactory = IdentifierFactory;
-
-})(DIMP);

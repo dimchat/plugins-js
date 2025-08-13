@@ -1,4 +1,4 @@
-;
+'use strict';
 // license: https://mit-license.org
 //
 //  Ming-Ke-Ming : Decentralized User Identity Authentication
@@ -32,17 +32,6 @@
 
 //! require <mkm.js>
 
-(function (ns) {
-    'use strict';
-
-    var Class          = ns.type.Class;
-    var Enum           = ns.type.Enum;
-    var ConstantString = ns.type.ConstantString;
-    var Base58         = ns.format.Base58;
-    var SHA256         = ns.digest.SHA256;
-    var RIPEMD160      = ns.digest.RIPEMD160;
-    var Address        = ns.protocol.Address;
-
     /**
      *  Address like BitCoin
      *
@@ -57,26 +46,29 @@
      *          code        = sha256(sha256(network + digest)).prefix(4);
      *          address     = base58_encode(network + digest + code);
      */
-    var BTCAddress = function (string, network) {
+    mkm.mkm.BTCAddress = function (string, network) {
         ConstantString.call(this, string);
-        this.__network = Enum.getInt(network);
+        this.__type = network;
     };
-    Class(BTCAddress, ConstantString, [Address], null);
+    var BTCAddress = mkm.mkm.BTCAddress;
 
-    // Override
-    BTCAddress.prototype.getType = function () {
-        return this.__network;
-    };
+    Class(BTCAddress, ConstantString, [Address], {
+
+        // Override
+        getType: function () {
+            return this.__type;
+        }
+
+    });
 
     /**
      *  Generate address with fingerprint and network ID
      *
      * @param {Uint8Array} fingerprint
-     * @param {uint|Enum} network
+     * @param {uint} network
      * @returns {BTCAddress}
      */
     BTCAddress.generate = function (fingerprint, network) {
-        network = Enum.getInt(network);
         // 1. digest = ripemd160(sha256(fingerprint))
         var digest = RIPEMD160.digest(SHA256.digest(fingerprint));
         // 2. head = network + digest
@@ -119,7 +111,7 @@
         var prefix = data.subarray(0, 21);
         var suffix = data.subarray(21, 25);
         var cc = check_code(prefix);
-        if (ns.type.Arrays.equals(cc, suffix)) {
+        if (Arrays.equals(cc, suffix)) {
             return new BTCAddress(string, data[0]);
         } else {
             return null;
@@ -136,8 +128,3 @@
         var sha256d = SHA256.digest(SHA256.digest(data));
         return sha256d.subarray(0, 4);
     };
-
-    //-------- namespace --------
-    ns.mkm.BTCAddress = BTCAddress;
-
-})(DIMP);
