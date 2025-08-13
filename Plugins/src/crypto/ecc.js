@@ -1,4 +1,4 @@
-;
+'use strict';
 // license: https://mit-license.org
 // =============================================================================
 // The MIT License (MIT)
@@ -29,14 +29,6 @@
 //! require <secp256k1.js> (https://unpkg.com/@enumatech/secp256k1-js@1.0.0/src/secp256k1.js)
 
 //! require <crypto.js>
-
-(function (ns) {
-    'use strict';
-
-    var Secp256k1 = window.Secp256k1;
-
-    var Class = ns.type.Class;
-    var BasePublicKey = ns.crypto.BasePublicKey;
 
     // var mem_set = function (buf, ch, len) {
     //     for (var i = 0; i < len; ++i) {
@@ -142,108 +134,6 @@
     };
 
     /**
-     *  ECC Public Key
-     *
-     *      keyInfo format: {
-     *          algorithm    : "ECC",
-     *          curve        : "secp256k1",
-     *          data         : "..." // base64_encode()
-     *      }
-     */
-    var ECCPublicKey = function (key) {
-        BasePublicKey.call(this, key);
-    };
-    Class(ECCPublicKey, BasePublicKey, null, {
-
-        // Override
-        getData: function () {
-            var pem = this.getValue('data');
-            if (!pem || pem.length === 0) {
-                throw new ReferenceError('ECC public key data not found');
-            } else if (pem.length === 66) {
-                // compressed key data
-                return ns.format.Hex.decode(pem);
-            } else if (pem.length === 130) {
-                // uncompressed key data
-                return ns.format.Hex.decode(pem);
-            } else {
-                // ANS.1 or X.509
-                var pos1 = pem.indexOf('-----BEGIN PUBLIC KEY-----');
-                if (pos1 >= 0) {
-                    pos1 += '-----BEGIN PUBLIC KEY-----'.length;
-                    var pos2 = pem.indexOf('-----END PUBLIC KEY-----', pos1);
-                    if (pos2 > 0) {
-                        var base64 = pem.substr(pos1, pos2-pos1);
-                        var data = ns.format.Base64.decode(base64);
-                        // TODO: parse ASN.1 or X.509
-                        return data.subarray(data.length - 65);
-                    }
-                }
-            }
-            throw new EvalError('key data error: ' + pem);
-        },
-
-        getSize: function () {
-            var size = this.getValue('keySize');
-            if (size) {
-                return Number(size);
-            } else {
-                return this.getData().length/8;
-            }
-        },
-
-        // Override
-        verify: function (data, signature) {
-            var hash = ns.digest.SHA256.digest(data);
-            var z = Secp256k1.uint256(hash, 16);
-            var sig = ecc_der_to_sig(signature, signature.length);
-            if (!sig) {
-                throw new EvalError('signature error: ' + signature);
-            }
-            var sig_r = Secp256k1.uint256(sig.r, 16);
-            var sig_s = Secp256k1.uint256(sig.s, 16);
-            var pub = decode_points(this.getData());
-            return Secp256k1.ecverify(pub.x, pub.y, sig_r, sig_s, z);
-        }
-    });
-
-    var decode_points = function (data) {
-        var x, y;
-        if (data.length === 65) {
-            if (data[0] === 4) {
-                x = Secp256k1.uint256(data.subarray(1, 33), 16);
-                y = Secp256k1.uint256(data.subarray(33, 65), 16);
-            } else {
-                // TODO: compressed key?
-                throw new EvalError('key data head error: ' + data);
-            }
-        } else if (data.length === 33) {
-            if (data[0] === 4) {
-                x = Secp256k1.uint256(data.subarray(1, 33), 16);
-                y = Secp256k1.decompressKey(x, 0);
-            } else {
-                // TODO: compressed key?
-                throw new EvalError('key data head error: ' + data);
-            }
-        } else {
-            throw new EvalError('key data length error: ' + data);
-        }
-        return {x: x, y: y};
-    };
-
-    //-------- namespace --------
-    ns.crypto.ECCPublicKey = ECCPublicKey;
-
-})(DIMP);
-
-(function (ns) {
-    'use strict';
-
-    var Class = ns.type.Class;
-    var PublicKey = ns.crypto.PublicKey;
-    var BasePrivateKey = ns.crypto.BasePrivateKey;
-
-    /**
      *  Refs:
      *      https://github.com/kmackay/micro-ecc
      *      https://github.com/digitalbitbox/mcu/blob/master/src/ecc.c
@@ -307,6 +197,111 @@
         return der[len] + 2;
     };
 
+    var decode_points = function (data) {
+        var x, y;
+        if (data.length === 65) {
+            if (data[0] === 4) {
+                x = Secp256k1.uint256(data.subarray(1, 33), 16);
+                y = Secp256k1.uint256(data.subarray(33, 65), 16);
+            } else {
+                // TODO: compressed key?
+                throw new EvalError('key data head error: ' + data);
+            }
+        } else if (data.length === 33) {
+            if (data[0] === 4) {
+                x = Secp256k1.uint256(data.subarray(1, 33), 16);
+                y = Secp256k1.decompressKey(x, 0);
+            } else {
+                // TODO: compressed key?
+                throw new EvalError('key data head error: ' + data);
+            }
+        } else {
+            throw new EvalError('key data length error: ' + data);
+        }
+        return {x: x, y: y};
+    };
+
+    var ecc_generate_private_key = function (bits) {
+        // create a new private key
+        var key = window.crypto.getRandomValues(new Uint8Array(bits/8))
+        var hex = Hex.encode(key);
+        this.setValue('data', hex);
+        this.setValue('curve', 'secp256k1');
+        this.setValue('digest', 'SHA256');
+        return key;
+    };
+
+
+    /**
+     *  ECC Public Key
+     *
+     *      keyInfo format: {
+     *          algorithm    : "ECC",
+     *          curve        : "secp256k1",
+     *          data         : "..." // base64_encode()
+     *      }
+     */
+    mk.crypto.ECCPublicKey = function (key) {
+        BasePublicKey.call(this, key);
+    };
+    var ECCPublicKey = mk.crypto.ECCPublicKey;
+
+    Class(ECCPublicKey, BasePublicKey, null, {
+
+        // Override
+        getData: function () {
+            var pem = this.getValue('data');
+            if (!pem || pem.length === 0) {
+                throw new ReferenceError('ECC public key data not found');
+            } else if (pem.length === 66) {
+                // compressed key data
+                return Hex.decode(pem);
+            } else if (pem.length === 130) {
+                // uncompressed key data
+                return Hex.decode(pem);
+            } else {
+                // ANS.1 or X.509
+                var pos1 = pem.indexOf('-----BEGIN PUBLIC KEY-----');
+                if (pos1 >= 0) {
+                    pos1 += '-----BEGIN PUBLIC KEY-----'.length;
+                    var pos2 = pem.indexOf('-----END PUBLIC KEY-----', pos1);
+                    if (pos2 > 0) {
+                        var base64 = pem.substr(pos1, pos2-pos1);
+                        var data = Base64.decode(base64);
+                        // TODO: parse ASN.1 or X.509
+                        return data.subarray(data.length - 65);
+                    }
+                }
+            }
+            throw new EvalError('key data error: ' + pem);
+        },
+
+        // protected
+        getKeySize: function () {
+            var size = this.getInt('keySize', null);
+            if (size) {
+                return size;
+            } else {
+                return this.getData().length / 8;
+            }
+        },
+
+        // Override
+        verify: function (data, signature) {
+            var hash = SHA256.digest(data);
+            var z = Secp256k1.uint256(hash, 16);
+            var sig = ecc_der_to_sig(signature, signature.length);
+            if (!sig) {
+                throw new EvalError('signature error: ' + signature);
+            }
+            var sig_r = Secp256k1.uint256(sig.r, 16);
+            var sig_s = Secp256k1.uint256(sig.s, 16);
+            var pub = decode_points(this.getData());
+            return Secp256k1.ecverify(pub.x, pub.y, sig_r, sig_s, z);
+        }
+    });
+
+
     /**
      *  ECC Private Key
      *
@@ -316,30 +311,50 @@
      *          data         : "..." // base64_encode()
      *      }
      */
-    var ECCPrivateKey = function (key) {
+    mk.crypto.ECCPrivateKey = function (key) {
         BasePrivateKey.call(this, key);
-        var keyPair = get_key_pair.call(this);
+        var keyPair = this.keyPair();
         this.__privateKey = keyPair.privateKey;
         this.__publicKey = keyPair.publicKey;
     };
+    var ECCPrivateKey = mk.crypto.ECCPrivateKey;
+
     Class(ECCPrivateKey, BasePrivateKey, null, {
 
         // Override
         getData: function () {
             var data = this.getValue('data');
             if (data && data.length > 0) {
-                return ns.format.Hex.decode(data);
+                return Hex.decode(data);
             } else {
                 throw new ReferenceError('ECC private key data not found');
             }
         },
 
-        getSize: function () {
-            var size = this.getValue('keySize');
-            if (size) {
-                return Number(size);
+        // protected
+        keyPair: function () {
+            var sKey;
+            var data = this.getData();
+            if (!data || data.length === 0) {
+                // generate
+                sKey = ecc_generate_private_key(256);
+            } else if (data.length === 32) {
+                // parse from Hex encoded
+                sKey = Secp256k1.uint256(data, 16);
             } else {
-                return this.getData().length/8;
+                throw new EvalError('key data length error: ' + data);
+            }
+            var pKey = Secp256k1.generatePublicKeyFromPrivateKeyData(sKey);
+            return {privateKey: sKey, publicKey: pKey}
+        },
+
+        // protected
+        getKeySize: function () {
+            var size = this.getInt('keySize', null);
+            if (size) {
+                return size;
+            } else {
+                return this.getData().length / 8;
             }
         },
 
@@ -358,11 +373,11 @@
 
         // Override
         sign: function (data) {
-            var hash = ns.digest.SHA256.digest(data);
+            var hash = SHA256.digest(data);
             var z = Secp256k1.uint256(hash, 16);
             var sig = Secp256k1.ecsign(this.__privateKey, z);
-            var sig_r = ns.format.Hex.decode(sig.r);
-            var sig_s = ns.format.Hex.decode(sig.s);
+            var sig_r = Hex.decode(sig.r);
+            var sig_s = Hex.decode(sig.s);
             var der = new Uint8Array(72);
             var sig_len = ecc_sig_to_der(sig_r, sig_s, der);
             if (sig_len === der.length) {
@@ -373,32 +388,52 @@
         }
     });
 
-    var get_key_pair = function () {
-        var sKey;
-        var data = this.getData();
-        if (!data || data.length === 0) {
-            // generate
-            sKey = generatePrivateKey.call(this, 256);
-        } else if (data.length === 32) {
-            // parse from Hex encoded
-            sKey = Secp256k1.uint256(data, 16);
-        } else {
-            throw new EvalError('key data length error: ' + data);
+
+    /**
+     *  ECC private key factory
+     *  ~~~~~~~~~~~~~~~~~~~~~~~
+     */
+    mk.crypto.ECCPrivateKeyFactory = function () {
+        BaseObject.call(this);
+    };
+    var ECCPrivateKeyFactory = mk.crypto.ECCPrivateKeyFactory;
+
+    Class(ECCPrivateKeyFactory, BaseObject, [PrivateKeyFactory], null);
+
+    // Override
+    ECCPrivateKeyFactory.prototype.generatePrivateKey = function() {
+        return new ECCPrivateKey({
+            'algorithm': AsymmetricAlgorithms.ECC
+        });
+    };
+
+    // Override
+    ECCPrivateKeyFactory.prototype.parsePrivateKey = function(key) {
+        // check 'data'
+        if (key['data'] === null) {
+            // key.data should not be empty
+            return null;
         }
-        var pKey = Secp256k1.generatePublicKeyFromPrivateKeyData(sKey);
-        return {privateKey: sKey, publicKey: pKey}
-    };
-    var generatePrivateKey = function (bits) {
-        // create a new private key
-        var key = window.crypto.getRandomValues(new Uint8Array(bits/8))
-        var hex = ns.format.Hex.encode(key);
-        this.setValue('data', hex);
-        this.setValue('curve', 'secp256k1');
-        this.setValue('digest', 'SHA256');
-        return key;
+        return new ECCPrivateKey(key);
     };
 
-    //-------- namespace --------
-    ns.crypto.ECCPrivateKey = ECCPrivateKey;
+    /**
+     *  ECC public key factory
+     *  ~~~~~~~~~~~~~~~~~~~~~~~
+     */
+    mk.crypto.ECCPublicKeyFactory = function () {
+        BaseObject.call(this);
+    };
+    var ECCPublicKeyFactory = mk.crypto.ECCPublicKeyFactory;
 
-})(DIMP);
+    Class(ECCPublicKeyFactory, BaseObject, [PublicKeyFactory], null);
+
+    // Override
+    ECCPublicKeyFactory.prototype.parsePublicKey = function(key) {
+        // check 'data'
+        if (key['data'] === null) {
+            // key.data should not be empty
+            return null;
+        }
+        return new ECCPublicKey(key);
+    };

@@ -1,4 +1,4 @@
-;
+'use strict';
 // license: https://mit-license.org
 // =============================================================================
 // The MIT License (MIT)
@@ -27,15 +27,12 @@
 
 //! require <crypto.js>
 
-(function (ns) {
-    'use strict';
-
     //-------- PEM functions begin --------
 
     var MIME_LINE_MAX_LEN = 76;
     var CR_LF = '\r\n';
     var rfc2045 = function (data) {
-        var base64 = ns.format.Base64.encode(data);
+        var base64 = Base64.encode(data);
         var length = base64.length;
         if (length > MIME_LINE_MAX_LEN && base64.indexOf(CR_LF) < 0) {
             var sb = '';
@@ -70,7 +67,7 @@
         if (end < start) {
             return null;
         }
-        return ns.format.Base64.decode(pem.substring(start, end));
+        return Base64.decode(pem.substring(start, end));
     };
 
     var encode_public = function (key) {
@@ -103,7 +100,7 @@
             throw new TypeError('this is a private key content');
         } else {
             // key content without wrapper
-            return ns.format.Base64.decode(pem);
+            return Base64.decode(pem);
         }
     };
     var decode_rsa_private = function (pem) {
@@ -117,37 +114,32 @@
             throw new TypeError('this is not a RSA private key content');
         } else {
             // key content without wrapper
-            return ns.format.Base64.decode(pem);
+            return Base64.decode(pem);
         }
     };
 
     //-------- PEM functions end --------
 
-    var Class = ns.type.Class;
-
     //
     //  PEM
     //
-    var pem = function () {
-        Object.call(this);
+    mk.format.PEM = function () {
+        BaseObject.call(this);
     };
-    Class(pem, Object, null, null);
+    var PEM = mk.format.PEM;
 
-    pem.prototype.encodePublicKey = function (key) {
+    Class(PEM, BaseObject, null, null);
+
+    PEM.prototype.encodePublicKey = function (key) {
         return encode_public(key);
     };
-    pem.prototype.encodePrivateKey = function (key) {
+    PEM.prototype.encodePrivateKey = function (key) {
         return encode_rsa_private(key);
     };
 
-    pem.prototype.decodePublicKey = function (pem) {
+    PEM.prototype.decodePublicKey = function (pem) {
         return decode_public(pem);
     };
-    pem.prototype.decodePrivateKey = function (pem) {
+    PEM.prototype.decodePrivateKey = function (pem) {
         return decode_rsa_private(pem);
     };
-
-    //-------- namespace --------
-    ns.format.PEM = new pem();
-
-})(DIMP);

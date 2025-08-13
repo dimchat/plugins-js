@@ -1,4 +1,4 @@
-;
+'use strict';
 // license: https://mit-license.org
 // =============================================================================
 // The MIT License (MIT)
@@ -31,12 +31,36 @@
 
 //! require <crypto.js>
 
-(function (ns) {
-    'use strict';
+    var x509_header = new Uint8Array([48, -127, -97, 48, 13, 6, 9, 42, -122, 72, -122, -9, 13, 1, 1, 1, 5, 0, 3, -127, -115, 0]);
+    var rsa_public_key = function (der) {
+        var key = Base64.encode(der);
+        var cipher = new JSEncrypt();
+        cipher.setPublicKey(key);
+        if (cipher.key.e === 0 || cipher.key.n === null) {
+            // FIXME: PKCS#1 -> X.509
+            var fixed = new Uint8Array(x509_header.length + der.length);
+            fixed.set(x509_header);
+            fixed.set(der, x509_header.length);
+            key = Base64.encode(fixed);
+            cipher.setPublicKey(key);
+        }
+        return cipher;
+    };
 
-    var Class = ns.type.Class;
-    var BasePublicKey = ns.crypto.BasePublicKey;
-    var EncryptKey = ns.crypto.EncryptKey;
+    var rsa_private_key = function (der) {
+        var key = Base64.encode(der);
+        var cipher = new JSEncrypt();
+        cipher.setPrivateKey(key);
+        return cipher;
+    };
+
+    var rsa_generate_keys = function (bits) {
+        var cipher = new JSEncrypt({default_key_size: bits});
+        // create a new private key
+        var key = cipher.getKey();
+        return key.getPublicKey() + '\r\n' + key.getPrivateKey();
+    }
+
 
     /**
      *  RSA Public Key
@@ -46,40 +70,37 @@
      *          data: "..."       // base64
      *      }
      */
-    var RSAPublicKey = function (key) {
+    mk.crypto.RSAPublicKey = function (key) {
         BasePublicKey.call(this, key);
     };
+    var RSAPublicKey = mk.crypto.RSAPublicKey;
+
     Class(RSAPublicKey, BasePublicKey, [EncryptKey], {
 
         // Override
         getData: function () {
             var data = this.getValue('data');
             if (data) {
-                return ns.format.PEM.decodePublicKey(data);
+                return PEM.decodePublicKey(data);
             } else {
-                throw new ReferenceError('public key data not found');
+                throw new ReferenceError('RSA public key data not found');
             }
         },
 
-        getSize: function () {
+        // protected
+        getKeySize: function () {
             // TODO: get from key
-
-            var size = this.getValue('keySize');
-            if (size) {
-                return Number(size);
-            } else {
-                return 1024/8; // 128
-            }
+            return this.getInt('keySize', 1024 / 8); // 128
         },
 
         // Override
         verify: function (data, signature) {
             // convert Uint8Array to WordArray
-            data = CryptoJS.enc.Hex.parse(ns.format.Hex.encode(data));
+            data = CryptoJS.enc.Hex.parse(Hex.encode(data));
             // convert Uint8Array to Base64
-            signature = ns.format.Base64.encode(signature);
+            signature = Base64.encode(signature);
             // create signer
-            var cipher = parse_key.call(this);
+            var cipher = rsa_public_key(this.getData());
             //
             //  verify(data, signature):
             //    param  WordArray
@@ -92,9 +113,9 @@
         // Override
         encrypt: function (plaintext, extra) {
             // convert Uint8Array to String
-            plaintext = ns.format.UTF8.decode(plaintext);
+            plaintext = UTF8.decode(plaintext);
             // create cipher
-            var cipher = parse_key.call(this);
+            var cipher = rsa_public_key(this.getData());
             //
             //  encrypt(data):
             //    param  String
@@ -102,9 +123,9 @@
             //
             var base64 = cipher.encrypt(plaintext);
             if (base64) {
-                var keySize = this.getSize();
+                var keySize = this.getKeySize();
                 // convert Base64 to Uint8Array
-                var res = ns.format.Base64.decode(base64);
+                var res = Base64.decode(base64);
                 if (res.length === keySize) {
                     return res;
                 }
@@ -118,36 +139,6 @@
         }
     });
 
-    var x509_header = new Uint8Array([48, -127, -97, 48, 13, 6, 9, 42, -122, 72, -122, -9, 13, 1, 1, 1, 5, 0, 3, -127, -115, 0]);
-    var parse_key = function () {
-        var der = this.getData();
-        var key = ns.format.Base64.encode(der);
-        var cipher = new JSEncrypt();
-        cipher.setPublicKey(key);
-        if (cipher.key.e === 0 || cipher.key.n === null) {
-            // FIXME: PKCS#1 -> X.509
-            var fixed = new Uint8Array(x509_header.length + der.length);
-            fixed.set(x509_header);
-            fixed.set(der, x509_header.length);
-            key = ns.format.Base64.encode(fixed);
-            cipher.setPublicKey(key);
-        }
-        return cipher;
-    };
-
-    //-------- namespace --------
-    ns.crypto.RSAPublicKey = RSAPublicKey;
-
-})(DIMP);
-
-(function (ns) {
-    'use strict';
-
-    var Class = ns.type.Class;
-    var PublicKey = ns.crypto.PublicKey;
-    var DecryptKey = ns.crypto.DecryptKey;
-    var BasePrivateKey = ns.crypto.BasePrivateKey;
-
     /**
      *  RSA Private Key
      *
@@ -157,41 +148,49 @@
      *          data         : "..." // base64_encode()
      *      }
      */
-    var RSAPrivateKey = function (key) {
+    mk.crypto.RSAPrivateKey = function (key) {
         BasePrivateKey.call(this, key);
+        // check key data
+        var pem = this.getValue('data');
+        if (!pem) {
+            this.generateKeys();
+        }
     };
+    var RSAPrivateKey = mk.crypto.RSAPrivateKey;
+
     Class(RSAPrivateKey, BasePrivateKey, [DecryptKey], {
 
         // Override
         getData: function () {
             var data = this.getValue('data');
             if (data) {
-                return ns.format.PEM.decodePrivateKey(data);
+                return PEM.decodePrivateKey(data);
             } else {
-                // generate key
-                var bits = this.getSize() * 8;
-                var pem = generate.call(this, bits);
-                return ns.format.PEM.decodePrivateKey(pem);
+                throw new ReferenceError('RSA private key data not found');
             }
         },
 
-        getSize: function () {
-            // TODO: get from key
+        // protected
+        generateKeys: function () {
+            var bits = this.getKeySize() * 8;
+            var pem = rsa_generate_keys(bits);
+            this.setValue('data', pem);
+            this.setValue('mode', 'ECB');
+            this.setValue('padding', 'PKCS1');
+            this.setValue('digest', 'SHA256');
+            return pem;
+        },
 
-            var size = this.getValue('keySize');
-            if (size) {
-                return Number(size);
-            } else {
-                return 1024/8; // 128
-            }
+        // protected
+        getKeySize: function () {
+            // TODO: get from key data
+            return this.getInt('keySize', 1024 / 8); // 128
         },
 
         // Override
         getPublicKey: function () {
             // create cipher
-            var key = ns.format.Base64.encode(this.getData());
-            var cipher = new JSEncrypt();
-            cipher.setPrivateKey(key);
+            var cipher = rsa_private_key(this.getData());
             var pem = cipher.getPublicKey();
             var info = {
                 'algorithm': this.getValue('algorithm'),
@@ -206,9 +205,9 @@
         // Override
         sign: function (data) {
             // convert Uint8Array to WordArray
-            data = CryptoJS.enc.Hex.parse(ns.format.Hex.encode(data));
+            data = CryptoJS.enc.Hex.parse(Hex.encode(data));
             // create signer
-            var cipher = parse_key.call(this);
+            var cipher = rsa_private_key(this.getData());
             //
             //  sign(data):
             //    param  WordArray
@@ -217,7 +216,7 @@
             var base64 = cipher.sign(data, CryptoJS.SHA256, 'sha256');
             if (base64) {
                 // convert Base64 to Uint8Array
-                return ns.format.Base64.decode(base64);
+                return Base64.decode(base64);
             } else {
                 throw new ReferenceError('RSA sign error: ' + data);
             }
@@ -226,9 +225,9 @@
         // Override
         decrypt: function (data, params) {
             // convert Uint8Array to Base64
-            data = ns.format.Base64.encode(data);
+            data = Base64.encode(data);
             // create cipher
-            var cipher = parse_key.call(this);
+            var cipher = rsa_private_key(this.getData());
             //
             //  decrypt(data):
             //    param  Base64;
@@ -237,34 +236,59 @@
             var string = cipher.decrypt(data);
             if (string) {
                 // convert String to Uint8Array
-                return ns.format.UTF8.encode(string);
+                return UTF8.encode(string);
             } else {
                 throw new ReferenceError('RSA decrypt error: ' + data);
             }
         }
     });
 
-    var generate = function (bits) {
-        var cipher = new JSEncrypt({default_key_size: bits});
-        // create a new private key
-        var key = cipher.getKey();
-        var pem = key.getPublicKey() + '\r\n' + key.getPrivateKey();
-        this.setValue('data', pem);
-        this.setValue('mode', 'ECB');
-        this.setValue('padding', 'PKCS1');
-        this.setValue('digest', 'SHA256');
-        return pem;
+
+    /**
+     *  RSA private key factory
+     *  ~~~~~~~~~~~~~~~~~~~~~~~
+     */
+    mk.crypto.RSAPrivateKeyFactory = function () {
+        BaseObject.call(this);
+    };
+    var RSAPrivateKeyFactory = mk.crypto.RSAPrivateKeyFactory;
+
+    Class(RSAPrivateKeyFactory, BaseObject, [PrivateKeyFactory], null);
+
+    // Override
+    RSAPrivateKeyFactory.prototype.generatePrivateKey = function() {
+        return new RSAPrivateKey({
+            'algorithm': AsymmetricAlgorithms.RSA
+        });
     };
 
-    var parse_key = function () {
-        var der = this.getData();
-        var key = ns.format.Base64.encode(der);
-        var cipher = new JSEncrypt();
-        cipher.setPrivateKey(key);
-        return cipher;
+    // Override
+    RSAPrivateKeyFactory.prototype.parsePrivateKey = function(key) {
+        // check 'data'
+        if (key['data'] === null) {
+            // key.data should not be empty
+            return null;
+        }
+        return new RSAPrivateKey(key);
     };
 
-    //-------- namespace --------
-    ns.crypto.RSAPrivateKey = RSAPrivateKey;
+    /**
+     *  RSA public key factory
+     *  ~~~~~~~~~~~~~~~~~~~~~~~
+     */
+    mk.crypto.RSAPublicKeyFactory = function () {
+        BaseObject.call(this);
+    };
+    var RSAPublicKeyFactory = mk.crypto.RSAPublicKeyFactory;
 
-})(DIMP);
+    Class(RSAPublicKeyFactory, BaseObject, [PublicKeyFactory], null);
+
+    // Override
+    RSAPublicKeyFactory.prototype.parsePublicKey = function(key) {
+        // check 'data'
+        if (key['data'] === null) {
+            // key.data should not be empty
+            return null;
+        }
+        return new RSAPublicKey(key);
+    };

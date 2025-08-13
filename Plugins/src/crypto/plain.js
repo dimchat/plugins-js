@@ -1,4 +1,4 @@
-;
+'use strict';
 // license: https://mit-license.org
 //
 //  DIMP : Decentralized Instant Messaging Protocol
@@ -30,73 +30,17 @@
 // =============================================================================
 //
 
-//! require 'namespace.js'
-
-(function (ns) {
-    'use strict';
-
-    var Class = ns.type.Class;
-    var SymmetricKey = ns.crypto.SymmetricKey;
-
-    var Password = function () {
-        Object.call(this);
-    };
-    Class(Password, Object, null, null);
-
-    Password.KEY_SIZE = 32;
-    Password.BLOCK_SIZE = 16;
+//! require <crypto.js>
 
     /**
-     *  Generate symmetric key with password string
-     *
-     * @param {String} password
-     * @return {SymmetricKey}
+     *  Symmetric key for broadcast message,
+     *  which will do nothing when en/decoding message data
      */
-    Password.generate = function (password) {
-        var data = ns.format.UTF8.encode(password);
-        var digest = ns.digest.SHA256.digest(data);
-        // AES key data
-        var filling = Password.KEY_SIZE - data.length;
-        if (filling > 0) {
-            // format: {digest_prefix}+{pwd_data}
-            var merged = new Uint8Array(Password.KEY_SIZE);
-            merged.set(digest.subarray(0, filling));
-            merged.set(data, filling);
-            data = merged;
-        } else if (filling < 0) {
-            // throw new RangeError('password too long: ' + password);
-            if (Password.KEY_SIZE === digest.length) {
-                data = digest;
-            } else {
-                // FIXME: what about KEY_SIZE > digest.length?
-                data = digest.subarray(0, Password.KEY_SIZE);
-            }
-        }
-        // AES iv
-        var iv = digest.subarray(digest.length - Password.BLOCK_SIZE, digest.length);
-        // generate AES key
-        var key = {
-            'algorithm': SymmetricKey.AES,
-            'data': ns.format.Base64.encode(data),
-            'iv': ns.format.Base64.encode(iv)
-        };
-        return SymmetricKey.parse(key);
-    };
-
-    //-------- namespace --------
-    ns.crypto.Password = Password;
-
-})(DIMP);
-
-(function (ns) {
-    'use strict';
-
-    var Class = ns.type.Class;
-    var BaseSymmetricKey = ns.crypto.BaseSymmetricKey;
-
-    var PlainKey = function (key) {
+    mk.crypto.PlainKey = function (key) {
         BaseSymmetricKey.call(this, key);
     };
+    var PlainKey = mk.crypto.PlainKey;
+
     Class(PlainKey, BaseSymmetricKey, null, {
 
         // Override
@@ -115,22 +59,35 @@
         }
     });
 
-    //-------- runtime --------
-    var plain_key = null;
-
     PlainKey.getInstance = function () {
         if (!plain_key) {
             var key = {
-                'algorithm': PlainKey.PLAIN
+                'algorithm': SymmetricAlgorithms.PLAIN
             };
             plain_key = new PlainKey(key);
         }
         return plain_key;
     };
 
-    PlainKey.PLAIN = 'PLAIN';
+    var plain_key = null;
 
-    //-------- namespace --------
-    ns.crypto.PlainKey = PlainKey;
+    /**
+     *  Plain key factory
+     *  ~~~~~~~~~~~~~~~~~
+     */
+    mk.crypto.PlainKeyFactory = function () {
+        BaseObject.call(this);
+    };
+    var PlainKeyFactory = mk.crypto.PlainKeyFactory;
 
-})(DIMP);
+    Class(PlainKeyFactory, BaseObject, [SymmetricKey.Factory], null);
+
+    // Override
+    PlainKeyFactory.prototype.generateSymmetricKey = function() {
+        return PlainKey.getInstance();
+    };
+
+    // Override
+    PlainKeyFactory.prototype.parseSymmetricKey = function(key) {
+        return PlainKey.getInstance();
+    };

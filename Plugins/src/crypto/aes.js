@@ -1,4 +1,4 @@
-;
+'use strict';
 // license: https://mit-license.org
 // =============================================================================
 // The MIT License (MIT)
@@ -29,22 +29,15 @@
 //! require <crypto-js/cipher-core.js>
 //! require <crypto-js/aes.js>
 
-//! require 'keys.js'
-
-(function (ns) {
-    'use strict';
-
-    var Class             = ns.type.Class;
-    var TransportableData = ns.format.TransportableData;
-    var BaseSymmetricKey  = ns.crypto.BaseSymmetricKey;
+//! require <dimp.js>
 
     var bytes2words = function (data) {
-        var string = ns.format.Hex.encode(data);
+        var string = Hex.encode(data);
         return CryptoJS.enc.Hex.parse(string);
     };
     var words2bytes = function (array) {
         var result = array.toString();
-        return ns.format.Hex.decode(result);
+        return Hex.decode(result);
     };
 
     var random_data = function (size) {
@@ -68,7 +61,7 @@
      *          data     : "{BASE64_ENCODE}}" // password data
      *      }
      */
-    var AESKey = function (key) {
+    mk.crypto.AESKey = function (key) {
         BaseSymmetricKey.call(this, key);
         // TODO: check algorithm parameters
         // 1. check mode = 'CBC'
@@ -84,6 +77,10 @@
             this.__tedKey = this.generateKeyData();
         }
     };
+    var AESKey = mk.crypto.AESKey;
+
+    AESKey.AES_CBC_PKCS7 = 'AES/CBC/PKCS7Padding';
+
     Class(AESKey, BaseSymmetricKey, null, {
 
         // protected
@@ -124,43 +121,41 @@
         },
 
         // protected
-        getIVString: function (params) {
-            var base64 = params['IV'];
-            if (base64 && base64.length > 0) {
-                return base64;
-            }
-            base64 = params['iv'];
-            if (base64 && base64.length > 0) {
-                return base64;
-            }
-            // compatible with old version
-            base64 = this.getString('iv', null);
-            if (base64 && base64.length > 0) {
-                return base64;
-            }
-            return this.getString('IV', null);
-        },
-
-        // protected
-        getIVData: function (params) {
-            // get base64 encoded IV from params
+        getInitVector: function (params) {
             if (!params) {
                 throw new SyntaxError('params must provided to fetch IV for AES');
             }
-            var base64 = this.getIVString(params);
+            var base64 = params['IV'];
+            if (!base64) {
+                base64 = params['iv'];
+                // if (!base64) {
+                //     // compatible with old version
+                //     base64 = this.getString('iv', null);
+                //     if (!base64) {
+                //         base64 = this.getString('IV', null);
+                //     }
+                // }
+            }
             // decode IV data
             var ted = TransportableData.parse(base64);
-            var ivData = !ted ? null : ted.getData();
-            if (ivData) {
-                return ivData;
+            if (ted) {
+                return ted.getData();
+            } else if (base64) {
+                throw new TypeError('IV data error: ' + base64);
+            } else {
+                return null;
             }
+        },
+
+        // protected
+        zeroInitVector: function () {
             // zero IV
             var blockSize = this.getBlockSize();
             return zero_data(blockSize);
         },
 
         // protected
-        newIVData: function (extra) {
+        newInitVector: function (extra) {
             if (!extra) {
                 throw new SyntaxError('extra dict must provided to store IV for AES');
             }
@@ -168,56 +163,79 @@
             var blockSize = this.getBlockSize();
             var ivData = random_data(blockSize);
             // put encoded IV into extra
-            var ted = TransportableData.create(ivData);
+            var ted = TransportableData.create(ivData, null);
             extra['IV'] = ted.toObject();
             // OK
-            return ivData;
+            return ivData; // ted.getData();
         },
 
         // Override
         encrypt: function (plaintext, extra) {
-            var message = bytes2words(plaintext);
-            // 1. random new 'IV'
-            var iv = this.newIVData(extra);
+            // 1. if 'IV' not found in extra params, new a random 'IV'
+            var iv = this.getInitVector(extra);
+            if (!iv) {
+                iv = this.newInitVector(extra);
+            }
             var ivWordArray = bytes2words(iv);
-            // 2. get key
+            // 2. get cipher key
             var key = this.getData();
             var keyWordArray = bytes2words(key);
             // 3. try to encrypt
-            try {
-                var cipher = CryptoJS.AES.encrypt(message, keyWordArray, { iv: ivWordArray });
-                if (cipher.hasOwnProperty('ciphertext')) {
-                    return words2bytes(cipher.ciphertext);
-                }
-            } catch (e) {
-                return null;
+            var message = bytes2words(plaintext);
+            var cipher = CryptoJS.AES.encrypt(message, keyWordArray, { iv: ivWordArray });
+            if (cipher.hasOwnProperty('ciphertext')) {
+                return words2bytes(cipher.ciphertext);
             }
             //throw new TypeError('failed to encrypt message with key: ' + this);
+            return null;
         },
 
         // Override
         decrypt: function (ciphertext, params) {
-            var message = bytes2words(ciphertext);
-            // 1. get 'IV' from extra params
-            var iv = this.getIVData(params);
+            // 1. if 'IV' not found in extra params, use an empty 'IV'
+            var iv = this.getInitVector(params);
+            if (!iv) {
+                iv = this.zeroInitVector();
+            }
             var ivWordArray = bytes2words(iv);
-            // 2. get key
+            // 2. get cipher key
             var key = this.getData();
             var keyWordArray = bytes2words(key);
             // 3. try to decrypt
+            var message = bytes2words(ciphertext);
             var cipher = {
                 ciphertext: message
             };
-            try {
-                var plaintext = CryptoJS.AES.decrypt(cipher, keyWordArray, { iv: ivWordArray });
-                return words2bytes(plaintext);
-            } catch (e) {
-                return null;
-            }
+            var plaintext = CryptoJS.AES.decrypt(cipher, keyWordArray, { iv: ivWordArray });
+            return words2bytes(plaintext);
         }
     });
 
-    //-------- namespace --------
-    ns.crypto.AESKey = AESKey;
 
-})(DIMP);
+    /**
+     *  AES key factory
+     *  ~~~~~~~~~~~~~~~
+     */
+    mk.crypto.AESKeyFactory = function () {
+        BaseObject.call(this);
+    };
+    var AESKeyFactory = mk.crypto.AESKeyFactory;
+
+    Class(AESKeyFactory, BaseObject, [SymmetricKeyFactory], null);
+
+    // Override
+    AESKeyFactory.prototype.generateSymmetricKey = function() {
+        return new AESKey({
+            'algorithm': SymmetricAlgorithms.AES
+        });
+    };
+
+    // Override
+    AESKeyFactory.prototype.parseSymmetricKey = function(key) {
+        // check 'data'
+        if (key['data'] === null) {
+            // key.data should not be empty
+            return null;
+        }
+        return new AESKey(key);
+    };
