@@ -123,23 +123,12 @@
     //
     //  PEM
     //
-    mk.format.PEM = function () {
-        BaseObject.call(this);
+    mk.format.PEM = {
+
+        encodePublicKey: encode_public,
+        encodePrivateKey: encode_rsa_private,
+
+        decodePublicKey: decode_public,
+        decodePrivateKey: decode_rsa_private
     };
     var PEM = mk.format.PEM;
-
-    Class(PEM, BaseObject, null, null);
-
-    PEM.prototype.encodePublicKey = function (key) {
-        return encode_public(key);
-    };
-    PEM.prototype.encodePrivateKey = function (key) {
-        return encode_rsa_private(key);
-    };
-
-    PEM.prototype.decodePublicKey = function (pem) {
-        return decode_public(pem);
-    };
-    PEM.prototype.decodePrivateKey = function (pem) {
-        return decode_rsa_private(pem);
-    };
