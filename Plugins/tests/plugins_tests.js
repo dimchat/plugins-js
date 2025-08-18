@@ -1,29 +1,42 @@
-;
+'use strict';
 
 //
 //  Test Cases
 //
-plugins_tests = [];
+var plugins_tests = [];
 
 !function (ns) {
-    'use strict';
 
     var Meta                  = ns.protocol.Meta;
     var CompatibleMetaFactory = ns.mkm.CompatibleMetaFactory;
+    var ExtensionLoader       = ns.ext.ExtensionLoader;
+    var PluginLoader          = ns.ext.PluginLoader;
 
-    ns.registerPlugins();
+    var LibraryLoader = function () {
+        this.ext_loader = new ExtensionLoader();
+        this.plg_loader = new PluginLoader();
+    };
+    LibraryLoader.prototype.run = function () {
+        this.ext_loader.load();
+        this.plg_loader.load();
+    };
+
+    var loader = new LibraryLoader();
+    loader.run();
 
     Meta.setFactory('1', new CompatibleMetaFactory('1'));
     Meta.setFactory('2', new CompatibleMetaFactory('2'));
     Meta.setFactory('4', new CompatibleMetaFactory('4'));
-    Meta.setFactory(Meta.MKM, new CompatibleMetaFactory(Meta.MKM));
-    Meta.setFactory(Meta.BTC, new CompatibleMetaFactory(Meta.BTC));
-    Meta.setFactory(Meta.ETH, new CompatibleMetaFactory(Meta.ETH));
+    Meta.setFactory('mkm', new CompatibleMetaFactory('mkm'));
+    Meta.setFactory('btc', new CompatibleMetaFactory('btc'));
+    Meta.setFactory('eth', new CompatibleMetaFactory('eth'));
+    Meta.setFactory('MKM', new CompatibleMetaFactory('MKM'));
+    Meta.setFactory('BTC', new CompatibleMetaFactory('BTC'));
+    Meta.setFactory('ETH', new CompatibleMetaFactory('ETH'));
 
 }(DIMP);
 
 !function (ns) {
-    'use strict';
 
     var moky = ns.format.UTF8.encode('moky');
 
@@ -49,7 +62,7 @@ plugins_tests = [];
 
     var test_keccak = function (string, expect) {
         var data = ns.format.UTF8.encode(string);
-        var hash = ns.digest.KECCAK256.digest(data);
+        var hash = ns.digest.Keccak256.digest(data);
         var res = ns.format.Hex.encode(hash);
         console.log('keccak256(' + string + ') = ' + res);
         assert(res === expect, 'keccak256 error');
@@ -70,7 +83,6 @@ plugins_tests = [];
 }(MONKEY);
 
 !function (ns) {
-    'use strict';
 
     var moky = ns.format.UTF8.encode('moky');
 
@@ -95,10 +107,9 @@ plugins_tests = [];
 }(MONKEY);
 
 !function (ns) {
-    'use strict';
 
-    var PublicKey = ns.crypto.PublicKey;
-    var PrivateKey = ns.crypto.PrivateKey;
+    var PublicKey = ns.protocol.PublicKey;
+    var PrivateKey = ns.protocol.PrivateKey;
 
     var moky = ns.format.UTF8.encode('moky');
 
@@ -136,29 +147,27 @@ plugins_tests = [];
 
 }(MONKEY);
 
+// !function (ns) {
+//
+//     var Arrays = ns.type.Arrays;
+//     var Password = ns.crypto.Password;
+//
+//     var moky = ns.format.UTF8.encode('moky');
+//
+//     var test_password = function () {
+//         var extra_params = {};
+//         var pwd = Password.generate('Hello world!');
+//         var ciphertext = pwd.encrypt(moky, extra_params);
+//         var plaintext = pwd.decrypt(ciphertext, extra_params);
+//         assert(Arrays.equals(plaintext, moky), 'generate password error');
+//     };
+//     plugins_tests.push(test_password);
+//
+// }(MONKEY);
+
 !function (ns) {
-    'use strict';
 
-    var Arrays = ns.type.Arrays;
-    var Password = ns.crypto.Password;
-
-    var moky = ns.format.UTF8.encode('moky');
-
-    var test_password = function () {
-        var extra_params = {};
-        var pwd = Password.generate('Hello world!');
-        var ciphertext = pwd.encrypt(moky, extra_params);
-        var plaintext = pwd.decrypt(ciphertext, extra_params);
-        assert(Arrays.equals(plaintext, moky), 'generate password error');
-    };
-    plugins_tests.push(test_password);
-
-}(MONKEY);
-
-!function (ns) {
-    'use strict';
-
-    var SymmetricKey = ns.crypto.SymmetricKey;
+    var SymmetricKey = ns.protocol.SymmetricKey;
 
     var Meta = ns.protocol.Meta;
 

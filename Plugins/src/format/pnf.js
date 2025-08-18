@@ -1,4 +1,4 @@
-;
+'use strict';
 // license: https://mit-license.org
 //
 //  MONKEY: Memory Object aNd KEYs
@@ -31,7 +31,7 @@
 //
 
 //! require <crypto.js>
-
+//! require <dimp.js>
 
     //  1. new BaseNetworkFile(dict);
     //  2. new BaseNetworkFile(data, filename, url, password);

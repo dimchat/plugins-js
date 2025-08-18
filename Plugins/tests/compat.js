@@ -1,4 +1,4 @@
-;
+'use strict';
 // license: https://mit-license.org
 //
 //  Ming-Ke-Ming : Decentralized User Identity Authentication
@@ -31,14 +31,12 @@
 //
 
 !function (ns) {
-    'use strict';
 
     var Class              = ns.type.Class;
-    var Meta               = ns.protocol.Meta;
     var DefaultMeta        = ns.mkm.DefaultMeta;
     var BTCMeta            = ns.mkm.BTCMeta;
     var ETHMeta            = ns.mkm.ETHMeta;
-    var GeneralMetaFactory = ns.mkm.GeneralMetaFactory;
+    var GeneralMetaFactory = ns.mkm.BaseMetaFactory;
 
     /**
      *  Compatible Meta factory
@@ -50,35 +48,17 @@
     Class(CompatibleMetaFactory, GeneralMetaFactory, null, {
 
         // Override
-        createMeta: function(key, seed, fingerprint) {
-            var type = this.getAlgorithm();
-            if (type === '1' || type === Meta.MKM) {
-                // MKM
-                return new DefaultMeta('1', key, seed, fingerprint);
-            } else if (type === '2' || type === Meta.BTC) {
-                // BTC
-                return new BTCMeta('2', key);
-            } else if (type === '4' || type === Meta.ETH) {
-                // ETH
-                return new ETHMeta('4', key);
-            } else {
-                // unknown type
-                return null;
-            }
-        },
-
-        // Override
         parseMeta: function(meta) {
             var out;
-            var gf = general_factory();
-            var type = gf.getMetaType(meta, '');
-            if (type === '1' || type === Meta.MKM) {
+            var helper = SharedAccountExtensions.getHelper();
+            var type = helper.getMetaType(meta, '');
+            if (type === '1' || type === 'mkm' || type === 'MKM') {
                 // MKM
                 out = new DefaultMeta(meta);
-            } else if (type === '2' || type === Meta.BTC) {
+            } else if (type === '2' || type === 'btc' || type === 'BTC') {
                 // BTC
                 out = new BTCMeta(meta);
-            } else if (type === '4' || type === Meta.ETH) {
+            } else if (type === '4' || type === 'eth' || type === 'ETH') {
                 // ETH
                 out = new ETHMeta(meta);
             } else {
@@ -88,11 +68,6 @@
             return out.isValid() ? out : null;
         }
     });
-
-    var general_factory = function () {
-        var man = ns.mkm.AccountFactoryManager;
-        return man.generalFactory;
-    };
 
     //-------- namespace --------
     ns.mkm.CompatibleMetaFactory = CompatibleMetaFactory;

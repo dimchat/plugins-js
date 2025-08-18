@@ -36,10 +36,10 @@
 //! require 'mkm/*.js'
 
 
-    dim.ext.PluginLoader = function () {
+    dimp.ext.PluginLoader = function () {
         BaseObject.call(this);
     };
-    var PluginLoader = dim.ext.PluginLoader;
+    var PluginLoader = dimp.ext.PluginLoader;
 
     Class(PluginLoader, BaseObject, null, {
 

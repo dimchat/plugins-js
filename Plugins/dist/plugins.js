@@ -1,26 +1,158 @@
 /**
- *  DIM-Plugins (v1.0.0)
+ *  DIM-Plugins (v2.0.0)
  *  (DIMP: Decentralized Instant Messaging Protocol)
  *
  * @author    moKy <albert.moky at gmail.com>
- * @date      Nov. 18, 2024
- * @copyright (c) 2024 Albert Moky
+ * @date      Aug. 19, 2025
+ * @copyright (c) 2020-2025 Albert Moky
  * @license   {@link https://mit-license.org | MIT License}
  */;
-(function (ns) {
-    'use strict';
-    var repeat = function (count) {
-        var string = '';
-        for (var i = 0; i < count; ++i) {
-            string += this
-        }
-        return string
-    };
-    if (typeof String.prototype.repeat !== 'function') {
-        String.prototype.repeat = repeat
+(function (dimp, dkd, mkm, mk) {
+    if (typeof dimp.ext !== 'object') {
+        dimp.ext = {}
     }
+    var Interface = mk.type.Interface;
+    var Class = mk.type.Class;
+    var Converter = mk.type.Converter;
+    var Wrapper = mk.type.Wrapper;
+    var Mapper = mk.type.Mapper;
+    var Stringer = mk.type.Stringer;
+    var IObject = mk.type.Object;
+    var BaseObject = mk.type.BaseObject;
+    var ConstantString = mk.type.ConstantString;
+    var Dictionary = mk.type.Dictionary;
+    var Arrays = mk.type.Arrays;
+    var StringCoder = mk.format.StringCoder;
+    var UTF8 = mk.format.UTF8;
+    var ObjectCoder = mk.format.ObjectCoder;
+    var JSONMap = mk.format.JSONMap;
+    var JSONList = mk.format.JSONList;
+    var DataCoder = mk.format.DataCoder;
+    var Base58 = mk.format.Base58;
+    var Base64 = mk.format.Base64;
+    var Hex = mk.format.Hex;
+    var BaseDataWrapper = mk.format.BaseDataWrapper;
+    var BaseFileWrapper = mk.format.BaseFileWrapper;
+    var DataDigester = mk.digest.DataDigester;
+    var MD5 = mk.digest.MD5;
+    var SHA1 = mk.digest.SHA1;
+    var SHA256 = mk.digest.SHA256;
+    var RIPEMD160 = mk.digest.RIPEMD160;
+    var Keccak256 = mk.digest.Keccak256;
+    var EncodeAlgorithms = mk.protocol.EncodeAlgorithms;
+    var TransportableData = mk.protocol.TransportableData;
+    var PortableNetworkFile = mk.protocol.PortableNetworkFile;
+    var SymmetricAlgorithms = mk.protocol.SymmetricAlgorithms;
+    var AsymmetricAlgorithms = mk.protocol.AsymmetricAlgorithms;
+    var EncryptKey = mk.protocol.EncryptKey;
+    var DecryptKey = mk.protocol.DecryptKey;
+    var SymmetricKey = mk.protocol.SymmetricKey;
+    var SymmetricKeyFactory = mk.protocol.SymmetricKey.Factory;
+    var AsymmetricKey = mk.protocol.AsymmetricKey;
+    var PublicKey = mk.protocol.PublicKey;
+    var PublicKeyFactory = mk.protocol.PublicKey.Factory;
+    var PrivateKey = mk.protocol.PrivateKey;
+    var PrivateKeyFactory = mk.protocol.PrivateKey.Factory;
+    var BaseSymmetricKey = mk.crypto.BaseSymmetricKey;
+    var BasePublicKey = mk.crypto.BasePublicKey;
+    var BasePrivateKey = mk.crypto.BasePrivateKey;
+    var GeneralCryptoHelper = mk.ext.GeneralCryptoHelper;
+    var SymmetricKeyHelper = mk.ext.SymmetricKeyHelper;
+    var PrivateKeyHelper = mk.ext.PrivateKeyHelper;
+    var PublicKeyHelper = mk.ext.PublicKeyHelper;
+    var GeneralFormatHelper = mk.ext.GeneralFormatHelper;
+    var PortableNetworkFileHelper = mk.ext.PortableNetworkFileHelper;
+    var TransportableDataHelper = mk.ext.TransportableDataHelper;
+    var SharedCryptoExtensions = mk.ext.SharedCryptoExtensions;
+    var SharedFormatExtensions = mk.ext.SharedFormatExtensions;
+    var EntityType = mkm.protocol.EntityType;
+    var Address = mkm.protocol.Address;
+    var AddressFactory = mkm.protocol.Address.Factory;
+    var ID = mkm.protocol.ID;
+    var IDFactory = mkm.protocol.ID.Factory;
+    var Meta = mkm.protocol.Meta;
+    var MetaFactory = mkm.protocol.Meta.Factory;
+    var Document = mkm.protocol.Document;
+    var DocumentFactory = mkm.protocol.Document.Factory;
+    var MetaType = mkm.protocol.MetaType;
+    var DocumentType = mkm.protocol.DocumentType;
+    var Identifier = mkm.mkm.Identifier;
+    var BaseMeta = mkm.mkm.BaseMeta;
+    var BaseDocument = mkm.mkm.BaseDocument;
+    var BaseBulletin = mkm.mkm.BaseBulletin;
+    var BaseVisa = mkm.mkm.BaseVisa;
+    var GeneralAccountHelper = mkm.ext.GeneralAccountHelper;
+    var AddressHelper = mkm.ext.AddressHelper;
+    var IdentifierHelper = mkm.ext.IdentifierHelper;
+    var MetaHelper = mkm.ext.MetaHelper;
+    var DocumentHelper = mkm.ext.DocumentHelper;
+    var SharedAccountExtensions = mkm.ext.SharedAccountExtensions;
+    var InstantMessage = dkd.protocol.InstantMessage;
+    var InstantMessageFactory = dkd.protocol.InstantMessage.Factory;
+    var SecureMessage = dkd.protocol.SecureMessage;
+    var SecureMessageFactory = dkd.protocol.SecureMessage.Factory;
+    var ReliableMessage = dkd.protocol.ReliableMessage;
+    var ReliableMessageFactory = dkd.protocol.ReliableMessage.Factory;
+    var Envelope = dkd.protocol.Envelope;
+    var EnvelopeFactory = dkd.protocol.Envelope.Factory;
+    var Content = dkd.protocol.Content;
+    var ContentFactory = dkd.protocol.Content.Factory;
+    var Command = dkd.protocol.Command;
+    var CommandFactory = dkd.protocol.Command.Factory;
+    var ContentType = dkd.protocol.ContentType;
+    var GroupCommand = dkd.protocol.GroupCommand;
+    var MessageEnvelope = dkd.msg.MessageEnvelope;
+    var PlainMessage = dkd.msg.PlainMessage;
+    var EncryptedMessage = dkd.msg.EncryptedMessage;
+    var NetworkMessage = dkd.msg.NetworkMessage;
+    var BaseContent = dkd.dkd.BaseContent;
+    var BaseTextContent = dkd.dkd.BaseTextContent;
+    var BaseFileContent = dkd.dkd.BaseFileContent;
+    var ImageFileContent = dkd.dkd.ImageFileContent;
+    var AudioFileContent = dkd.dkd.AudioFileContent;
+    var VideoFileContent = dkd.dkd.VideoFileContent;
+    var WebPageContent = dkd.dkd.WebPageContent;
+    var NameCardContent = dkd.dkd.NameCardContent;
+    var BaseQuoteContent = dkd.dkd.BaseQuoteContent;
+    var BaseMoneyContent = dkd.dkd.BaseMoneyContent;
+    var TransferMoneyContent = dkd.dkd.TransferMoneyContent;
+    var ListContent = dkd.dkd.ListContent;
+    var CombineForwardContent = dkd.dkd.CombineForwardContent;
+    var SecretContent = dkd.dkd.SecretContent;
+    var AppCustomizedContent = dkd.dkd.AppCustomizedContent;
+    var BaseCommand = dkd.dkd.BaseCommand;
+    var BaseMetaCommand = dkd.dkd.BaseMetaCommand;
+    var BaseDocumentCommand = dkd.dkd.BaseDocumentCommand;
+    var BaseReceiptCommand = dkd.dkd.BaseReceiptCommand;
+    var BaseHistoryCommand = dkd.dkd.BaseHistoryCommand;
+    var BaseGroupCommand = dkd.dkd.BaseGroupCommand;
+    var InviteGroupCommand = dkd.dkd.InviteGroupCommand;
+    var ExpelGroupCommand = dkd.dkd.ExpelGroupCommand;
+    var JoinGroupCommand = dkd.dkd.JoinGroupCommand;
+    var QuitGroupCommand = dkd.dkd.QuitGroupCommand;
+    var ResetGroupCommand = dkd.dkd.ResetGroupCommand;
+    var HireGroupCommand = dkd.dkd.HireGroupCommand;
+    var FireGroupCommand = dkd.dkd.FireGroupCommand;
+    var ResignGroupCommand = dkd.dkd.ResignGroupCommand;
+    var GeneralMessageHelper = dkd.ext.GeneralMessageHelper;
+    var ContentHelper = dkd.ext.ContentHelper;
+    var EnvelopeHelper = dkd.ext.EnvelopeHelper;
+    var InstantMessageHelper = dkd.ext.InstantMessageHelper;
+    var SecureMessageHelper = dkd.ext.SecureMessageHelper;
+    var ReliableMessageHelper = dkd.ext.ReliableMessageHelper;
+    var GeneralCommandHelper = dkd.ext.GeneralCommandHelper;
+    var CommandHelper = dkd.ext.CommandHelper;
+    var SharedCommandExtensions = dkd.ext.SharedCommandExtensions;
+    var SharedMessageExtensions = dkd.ext.SharedMessageExtensions;
+    var string_repeat = function (count) {
+        var text = '';
+        for (var i = 0; i < count; ++i) {
+            text += this
+        }
+        return text
+    };
 
-    function base(ALPHABET) {
+    function base_chars(ALPHABET) {
         if (ALPHABET.length >= 255) {
             throw new TypeError("Alphabet too long")
         }
@@ -73,7 +205,7 @@
             while (it2 !== size && b58[it2] === 0) {
                 it2++
             }
-            var str = repeat.call(LEADER, zeroes);
+            var str = string_repeat.call(LEADER, zeroes);
             for (; it2 < size; ++it2) {
                 str += ALPHABET.charAt(b58[it2])
             }
@@ -145,23 +277,18 @@
         return {encode: encode, decodeUnsafe: decodeUnsafe, decode: decode}
     }
 
-    var bs58 = base('123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz');
-    var Class = ns.type.Class;
-    var DataCoder = ns.format.DataCoder;
-    var Base58Coder = function () {
-        Object.call(this)
+    var bs58 = base_chars('123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz');
+    mk.format.Base58Coder = function () {
+        BaseObject.call(this)
     };
-    Class(Base58Coder, Object, [DataCoder], {
+    var Base58Coder = mk.format.Base58Coder;
+    Class(Base58Coder, BaseObject, [DataCoder], {
         encode: function (data) {
             return bs58.encode(data)
         }, decode: function (string) {
             return bs58.decode(string)
         }
     });
-    ns.format.Base58.setCoder(new Base58Coder())
-})(DIMP);
-(function (ns) {
-    'use strict';
     var base64_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
     var base64_values = new Int8Array(128);
     (function (chars, values) {
@@ -223,22 +350,17 @@
         }
         return Uint8Array.from(array)
     };
-    var Class = ns.type.Class;
-    var DataCoder = ns.format.DataCoder;
-    var Base64Coder = function () {
-        Object.call(this)
+    mk.format.Base64Coder = function () {
+        BaseObject.call(this)
     };
-    Class(Base64Coder, Object, [DataCoder], {
+    var Base64Coder = mk.format.Base64Coder;
+    Class(Base64Coder, BaseObject, [DataCoder], {
         encode: function (data) {
             return base64_encode(data)
         }, decode: function (string) {
             return base64_decode(string)
         }
     });
-    ns.format.Base64.setCoder(new Base64Coder())
-})(DIMP);
-(function (ns) {
-    'use strict';
     var hex_chars = '0123456789abcdef';
     var hex_values = new Int8Array(128);
     (function (chars, values) {
@@ -287,22 +409,165 @@
         }
         return data
     };
-    var Class = ns.type.Class;
-    var DataCoder = ns.format.DataCoder;
-    var HexCoder = function () {
-        Object.call(this)
+    mk.format.HexCoder = function () {
+        BaseObject.call(this)
     };
-    Class(HexCoder, Object, [DataCoder], {
+    var HexCoder = mk.format.HexCoder;
+    Class(HexCoder, BaseObject, [DataCoder], {
         encode: function (data) {
             return hex_encode(data)
         }, decode: function (string) {
             return hex_decode(string)
         }
     });
-    ns.format.Hex.setCoder(new HexCoder())
-})(DIMP);
-(function (ns) {
-    'use strict';
+    mk.format.JSONCoder = function () {
+        BaseObject.call(this)
+    };
+    var JSONCoder = mk.format.JSONCoder;
+    Class(JSONCoder, BaseObject, [ObjectCoder], {
+        encode: function (object) {
+            return JSON.stringify(object)
+        }, decode: function (string) {
+            return JSON.parse(string)
+        }
+    });
+    mk.format.BaseNetworkFile = function () {
+        var ted = null, filename = null, url = null, password = null;
+        if (arguments.length === 1) {
+            Dictionary.call(this, arguments[0])
+        } else if (arguments.length === 4) {
+            Dictionary.call(this);
+            ted = arguments[0];
+            filename = arguments[1];
+            url = arguments[2];
+            password = arguments[3]
+        } else {
+            throw new SyntaxError('PNF arguments error: ' + arguments);
+        }
+        var wrapper = new BaseFileWrapper(this.toMap());
+        if (ted) {
+            wrapper.setData(ted)
+        }
+        if (filename) {
+            wrapper.setFilename(filename)
+        }
+        if (url) {
+            wrapper.setURL(url)
+        }
+        if (password) {
+            wrapper.setPassword(password)
+        }
+        this.__wrapper = wrapper
+    };
+    var BaseNetworkFile = mk.format.BaseNetworkFile;
+    Class(BaseNetworkFile, Dictionary, [PortableNetworkFile], {
+        getData: function () {
+            var ted = this.__wrapper.getData();
+            return !ted ? null : ted.getData()
+        }, setData: function (binary) {
+            this.__wrapper.setBinaryData(binary)
+        }, getFilename: function () {
+            return this.__wrapper.getFilename()
+        }, setFilename: function (filename) {
+            this.__wrapper.setFilename(filename)
+        }, getURL: function () {
+            return this.__wrapper.getURL()
+        }, setURL: function (url) {
+            this.__wrapper.setURL(url)
+        }, getPassword: function () {
+            return this.__wrapper.getPassword()
+        }, setPassword: function (key) {
+            this.__wrapper.setPassword(key)
+        }, toString: function () {
+            var url = this.getURLString();
+            if (url) {
+                return url
+            }
+            return JSONMap.encode(this.toMap())
+        }, toObject: function () {
+            var url = this.getURLString();
+            if (url) {
+                return url
+            }
+            return this.toMap()
+        }, getURLString: function () {
+            var url = this.getString('URL', '');
+            var len = url.length;
+            if (len === 0) {
+                return null
+            } else if (len > 5 && url.substring(0, 5) === 'data:') {
+                return url
+            }
+            var count = this.getLength();
+            if (count === 1) {
+                return url
+            } else if (count === 2 && this.getValue('filename')) {
+                return url
+            } else {
+                return null
+            }
+        }
+    });
+    mk.format.BaseNetworkFileFactory = function () {
+        BaseObject.call(this)
+    };
+    var BaseNetworkFileFactory = mk.format.BaseNetworkFileFactory;
+    Class(BaseNetworkFileFactory, BaseObject, [PortableNetworkFile.Factory], {
+        createPortableNetworkFile: function (ted, filename, url, password) {
+            return new BaseNetworkFile(ted, filename, url, password)
+        }, parsePortableNetworkFile: function (pnf) {
+            if (pnf['data'] || pnf['URL'] || pnf['filename']) {
+            } else {
+                return null
+            }
+            return new BaseNetworkFile(pnf)
+        }
+    });
+    mk.format.Base64Data = function (info) {
+        var binary = null;
+        if (info instanceof Uint8Array) {
+            binary = info;
+            info = null
+        }
+        Dictionary.call(this, info);
+        var wrapper = new BaseDataWrapper(this.toMap());
+        if (binary) {
+            wrapper.setAlgorithm(EncodeAlgorithms.BASE_64);
+            if (binary.length > 0) {
+                wrapper.setData(binary)
+            }
+        }
+        this.__wrapper = wrapper
+    };
+    var Base64Data = mk.format.Base64Data;
+    Class(Base64Data, Dictionary, [TransportableData], {
+        getAlgorithm: function () {
+            return this.__wrapper.getAlgorithm()
+        }, getData: function () {
+            return this.__wrapper.getData()
+        }, toObject: function () {
+            return this.toString()
+        }, toString: function () {
+            return this.__wrapper.toString()
+        }, encode: function (mimeType) {
+            return this.__wrapper.encode(mimeType)
+        }
+    });
+    mk.format.Base64DataFactory = function () {
+        BaseObject.call(this)
+    };
+    var Base64DataFactory = mk.format.Base64DataFactory;
+    Class(Base64DataFactory, BaseObject, [TransportableData.Factory], {
+        createTransportableData: function (data) {
+            return new Base64Data(data)
+        }, parseTransportableData: function (ted) {
+            if (ted['data']) {
+            } else {
+                return null
+            }
+            return new Base64Data(ted)
+        }
+    });
     var utf8_encode = function (string) {
         var len = string.length;
         var array = [];
@@ -367,482 +632,181 @@
         }
         return string
     };
-    var Class = ns.type.Class;
-    var StringCoder = ns.format.StringCoder;
-    var Utf8Coder = function () {
-        Object.call(this)
+    mk.format.UTF8Coder = function () {
+        BaseObject.call(this)
     };
-    Class(Utf8Coder, Object, [StringCoder], {
+    var UTF8Coder = mk.format.UTF8Coder;
+    Class(UTF8Coder, BaseObject, [StringCoder], {
         encode: function (string) {
             return utf8_encode(string)
         }, decode: function (data) {
             return utf8_decode(data)
         }
     })
-    ns.format.UTF8.setCoder(new Utf8Coder())
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var ObjectCoder = ns.format.ObjectCoder;
-    var JsonCoder = function () {
-        Object.call(this)
+    mk.digest.MD5Digester = function () {
+        BaseObject.call(this)
     };
-    Class(JsonCoder, Object, [ObjectCoder], {
-        encode: function (object) {
-            return JSON.stringify(object)
-        }, decode: function (string) {
-            return JSON.parse(string)
-        }
-    });
-    ns.format.JSON.setCoder(new JsonCoder())
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var Dictionary = ns.type.Dictionary;
-    var TransportableData = ns.format.TransportableData;
-    var BaseDataWrapper = ns.format.BaseDataWrapper;
-    var Base64Data = function (info) {
-        var binary = null;
-        if (info instanceof Uint8Array) {
-            binary = info;
-            info = null
-        }
-        Dictionary.call(this, info);
-        var wrapper = new BaseDataWrapper(this.toMap());
-        if (binary) {
-            wrapper.setAlgorithm(TransportableData.BASE64);
-            if (binary.length > 0) {
-                wrapper.setData(binary)
-            }
-        }
-        this.__wrapper = wrapper
-    };
-    Class(Base64Data, Dictionary, [TransportableData], {
-        getAlgorithm: function () {
-            return this.__wrapper.getAlgorithm()
-        }, getData: function () {
-            return this.__wrapper.getData()
-        }, toObject: function () {
-            return this.toString()
-        }, toString: function () {
-            return this.__wrapper.toString()
-        }, encode: function (mimeType) {
-            return this.__wrapper.encode(mimeType)
-        }
-    });
-    var Base64DataFactory = function () {
-        Object.call(this)
-    };
-    Class(Base64DataFactory, Object, [TransportableData.Factory], {
-        createTransportableData: function (data) {
-            return new Base64Data(data)
-        }, parseTransportableData: function (ted) {
-            return new Base64Data(ted)
-        }
-    });
-    var factory = new Base64DataFactory();
-    TransportableData.setFactory('*', factory);
-    TransportableData.setFactory(TransportableData.BASE64, factory)
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var Dictionary = ns.type.Dictionary;
-    var JsON = ns.format.JSON;
-    var PortableNetworkFile = ns.format.PortableNetworkFile;
-    var BaseFileWrapper = ns.format.BaseFileWrapper;
-    var BaseNetworkFile = function () {
-        var ted = null, filename = null, url = null, password = null;
-        if (arguments.length === 1) {
-            Dictionary.call(this, arguments[0])
-        } else if (arguments.length === 4) {
-            Dictionary.call(this);
-            ted = arguments[0];
-            filename = arguments[1];
-            url = arguments[2];
-            password = arguments[3]
-        } else {
-            throw new SyntaxError('PNF arguments error: ' + arguments);
-        }
-        var wrapper = new BaseFileWrapper(this.toMap());
-        if (ted) {
-            wrapper.setData(ted)
-        }
-        if (filename) {
-            wrapper.setFilename(filename)
-        }
-        if (url) {
-            wrapper.setURL(url)
-        }
-        if (password) {
-            wrapper.setPassword(password)
-        }
-        this.__wrapper = wrapper
-    };
-    Class(BaseNetworkFile, Dictionary, [PortableNetworkFile], {
-        getData: function () {
-            var ted = this.__wrapper.getData();
-            return !ted ? null : ted.getData()
-        }, setData: function (binary) {
-            this.__wrapper.setBinaryData(binary)
-        }, getFilename: function () {
-            return this.__wrapper.getFilename()
-        }, setFilename: function (filename) {
-            this.__wrapper.setFilename(filename)
-        }, getURL: function () {
-            return this.__wrapper.getURL()
-        }, setURL: function (url) {
-            this.__wrapper.setURL(url)
-        }, getPassword: function () {
-            return this.__wrapper.getPassword()
-        }, setPassword: function (key) {
-            this.__wrapper.setPassword(key)
-        }, toString: function () {
-            var url = this.getURLString();
-            if (url) {
-                return url
-            }
-            return JsON.encode(this.toMap())
-        }, toObject: function () {
-            var url = this.getURLString();
-            if (url) {
-                return url
-            }
-            return this.toMap()
-        }, getURLString: function () {
-            var url = this.getString('URL', '');
-            var len = url.length;
-            if (len === 0) {
-                return null
-            } else if (len > 5 && url.substring(0, 5) === 'data:') {
-                return url
-            }
-            var count = this.getLength();
-            if (count === 1) {
-                return url
-            } else if (count === 2 && this.getValue('filename')) {
-                return url
-            } else {
-                return null
-            }
-        }
-    });
-    var BaseNetworkFileFactory = function () {
-        Object.call(this)
-    };
-    Class(BaseNetworkFileFactory, Object, [PortableNetworkFile.Factory], {
-        createPortableNetworkFile: function (ted, filename, url, password) {
-            return new BaseNetworkFile(ted, filename, url, password)
-        }, parsePortableNetworkFile: function (pnf) {
-            return new BaseNetworkFile(pnf)
-        }
-    });
-    var factory = new BaseNetworkFileFactory();
-    PortableNetworkFile.setFactory(factory)
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var DataDigester = ns.digest.DataDigester;
-    var hash = function () {
-        Object.call(this)
-    };
-    Class(hash, Object, [DataDigester], {
+    var MD5Digester = mk.digest.MD5Digester;
+    Class(MD5Digester, BaseObject, [DataDigester], {
         digest: function (data) {
-            var hex = ns.format.Hex.encode(data);
+            var hex = Hex.encode(data);
             var array = CryptoJS.enc.Hex.parse(hex);
             var result = CryptoJS.MD5(array);
-            return ns.format.Hex.decode(result.toString())
+            return Hex.decode(result.toString())
         }
     });
-    ns.digest.MD5.setDigester(new hash())
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var DataDigester = ns.digest.DataDigester;
-    var hash = function () {
-        Object.call(this)
+    mk.digest.SHA256Digester = function () {
+        BaseObject.call(this)
     };
-    Class(hash, Object, [DataDigester], {
+    var SHA256Digester = mk.digest.SHA256Digester;
+    Class(SHA256Digester, BaseObject, [DataDigester], {
         digest: function (data) {
-            var hex = ns.format.Hex.encode(data);
+            var hex = Hex.encode(data);
             var array = CryptoJS.enc.Hex.parse(hex);
             var result = CryptoJS.SHA256(array);
-            return ns.format.Hex.decode(result.toString())
+            return Hex.decode(result.toString())
         }
     });
-    ns.digest.SHA256.setDigester(new hash())
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var DataDigester = ns.digest.DataDigester;
-    var hash = function () {
-        Object.call(this)
+    mk.digest.RIPEMD160Digester = function () {
+        BaseObject.call(this)
     };
-    Class(hash, Object, [DataDigester], {
+    var RIPEMD160Digester = mk.digest.RIPEMD160Digester;
+    Class(RIPEMD160Digester, BaseObject, [DataDigester], {
         digest: function (data) {
-            var hex = ns.format.Hex.encode(data);
+            var hex = Hex.encode(data);
             var array = CryptoJS.enc.Hex.parse(hex);
             var result = CryptoJS.RIPEMD160(array);
-            return ns.format.Hex.decode(result.toString())
+            return Hex.decode(result.toString())
         }
     });
-    ns.digest.RIPEMD160.setDigester(new hash())
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var DataDigester = ns.digest.DataDigester;
-    var hash = function () {
-        Object.call(this)
+    mk.digest.Keccak256Digester = function () {
+        BaseObject.call(this)
     };
-    Class(hash, Object, [DataDigester], {
+    var Keccak256Digester = mk.digest.Keccak256Digester;
+    Class(Keccak256Digester, BaseObject, [DataDigester], {
         digest: function (data) {
             var array = window.keccak256.update(data).digest();
             return new Uint8Array(array)
         }
     });
-    ns.digest.KECCAK256.setDigester(new hash())
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var MIME_LINE_MAX_LEN = 76;
-    var CR_LF = '\r\n';
-    var rfc2045 = function (data) {
-        var base64 = ns.format.Base64.encode(data);
-        var length = base64.length;
-        if (length > MIME_LINE_MAX_LEN && base64.indexOf(CR_LF) < 0) {
-            var sb = '';
-            var start = 0, end;
-            for (; start < length; start += MIME_LINE_MAX_LEN) {
-                end = start + MIME_LINE_MAX_LEN;
-                if (end < length) {
-                    sb += base64.substring(start, end);
-                    sb += CR_LF
-                } else {
-                    sb += base64.substring(start, length);
-                    break
-                }
-            }
-            base64 = sb
-        }
-        return base64
+    var bytes2words = function (data) {
+        var string = Hex.encode(data);
+        return CryptoJS.enc.Hex.parse(string)
     };
-    var encode_key = function (key, left, right) {
-        var content = rfc2045(key);
-        return left + CR_LF + content + CR_LF + right
+    var words2bytes = function (array) {
+        var result = array.toString();
+        return Hex.decode(result)
     };
-    var decode_key = function (pem, left, right) {
-        var start = pem.indexOf(left);
-        if (start < 0) {
-            return null
+    var random_data = function (size) {
+        var data = new Uint8Array(size);
+        for (var i = 0; i < size; ++i) {
+            data[i] = Math.floor(Math.random() * 256)
         }
-        start += left.length;
-        var end = pem.indexOf(right, start);
-        if (end < start) {
-            return null
-        }
-        return ns.format.Base64.decode(pem.substring(start, end))
+        return data
     };
-    var encode_public = function (key) {
-        return encode_key(key, '-----BEGIN PUBLIC KEY-----', '-----END PUBLIC KEY-----')
+    var zero_data = function (size) {
+        return new Uint8Array(size)
     };
-    var encode_rsa_private = function (key) {
-        return encode_key(key, '-----BEGIN RSA PRIVATE KEY-----', '-----END RSA PRIVATE KEY-----')
-    };
-    var decode_public = function (pem) {
-        var data = decode_key(pem, '-----BEGIN PUBLIC KEY-----', '-----END PUBLIC KEY-----');
-        if (!data) {
-            data = decode_key(pem, "-----BEGIN RSA PUBLIC KEY-----", "-----END RSA PUBLIC KEY-----")
-        }
-        if (data) {
-            return data
-        }
-        if (pem.indexOf('PRIVATE KEY') > 0) {
-            throw new TypeError('this is a private key content');
+    mk.crypto.AESKey = function (key) {
+        BaseSymmetricKey.call(this, key);
+        var base64 = this.getValue('data');
+        if (base64) {
+            this.__tedKey = null
         } else {
-            return ns.format.Base64.decode(pem)
+            this.__tedKey = this.generateKeyData()
         }
     };
-    var decode_rsa_private = function (pem) {
-        var data = decode_key(pem, '-----BEGIN RSA PRIVATE KEY-----', '-----END RSA PRIVATE KEY-----');
-        if (data) {
-            return data
-        }
-        if (pem.indexOf('PUBLIC KEY') > 0) {
-            throw new TypeError('this is not a RSA private key content');
-        } else {
-            return ns.format.Base64.decode(pem)
-        }
-    };
-    var Class = ns.type.Class;
-    var pem = function () {
-        Object.call(this)
-    };
-    Class(pem, Object, null, null);
-    pem.prototype.encodePublicKey = function (key) {
-        return encode_public(key)
-    };
-    pem.prototype.encodePrivateKey = function (key) {
-        return encode_rsa_private(key)
-    };
-    pem.prototype.decodePublicKey = function (pem) {
-        return decode_public(pem)
-    };
-    pem.prototype.decodePrivateKey = function (pem) {
-        return decode_rsa_private(pem)
-    };
-    ns.format.PEM = new pem()
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var BasePublicKey = ns.crypto.BasePublicKey;
-    var EncryptKey = ns.crypto.EncryptKey;
-    var RSAPublicKey = function (key) {
-        BasePublicKey.call(this, key)
-    };
-    Class(RSAPublicKey, BasePublicKey, [EncryptKey], {
-        getData: function () {
-            var data = this.getValue('data');
-            if (data) {
-                return ns.format.PEM.decodePublicKey(data)
-            } else {
-                throw new ReferenceError('public key data not found');
+    var AESKey = mk.crypto.AESKey;
+    AESKey.AES_CBC_PKCS7 = 'AES/CBC/PKCS7Padding';
+    Class(AESKey, BaseSymmetricKey, null, {
+        generateKeyData: function () {
+            var keySize = this.getKeySize();
+            var pwd = random_data(keySize);
+            var ted = TransportableData.create(pwd);
+            this.setValue('data', ted.toObject());
+            return ted
+        }, getKeySize: function () {
+            return this.getInt('keySize', 32)
+        }, getBlockSize: function () {
+            return this.getInt('blockSize', 16)
+        }, getData: function () {
+            var ted = this.__tedKey;
+            if (!ted) {
+                var base64 = this.getValue('data');
+                ted = TransportableData.parse(base64);
+                this.__tedKey = ted
             }
-        }, getSize: function () {
-            var size = this.getValue('keySize');
-            if (size) {
-                return Number(size)
-            } else {
-                return 1024 / 8
+            return !ted ? null : ted.getData()
+        }, getInitVector: function (params) {
+            if (!params) {
+                throw new SyntaxError('params must provided to fetch IV for AES');
             }
-        }, verify: function (data, signature) {
-            data = CryptoJS.enc.Hex.parse(ns.format.Hex.encode(data));
-            signature = ns.format.Base64.encode(signature);
-            var cipher = parse_key.call(this);
-            return cipher.verify(data, signature, CryptoJS.SHA256)
+            var base64 = params['IV'];
+            if (!base64) {
+                base64 = params['iv']
+            }
+            var ted = TransportableData.parse(base64);
+            if (ted) {
+                return ted.getData()
+            } else if (base64) {
+                throw new TypeError('IV data error: ' + base64);
+            } else {
+                return null
+            }
+        }, zeroInitVector: function () {
+            var blockSize = this.getBlockSize();
+            return zero_data(blockSize)
+        }, newInitVector: function (extra) {
+            if (!extra) {
+                throw new SyntaxError('extra dict must provided to store IV for AES');
+            }
+            var blockSize = this.getBlockSize();
+            var ivData = random_data(blockSize);
+            var ted = TransportableData.create(ivData, null);
+            extra['IV'] = ted.toObject();
+            return ivData
         }, encrypt: function (plaintext, extra) {
-            plaintext = ns.format.UTF8.decode(plaintext);
-            var cipher = parse_key.call(this);
-            var base64 = cipher.encrypt(plaintext);
-            if (base64) {
-                var keySize = this.getSize();
-                var res = ns.format.Base64.decode(base64);
-                if (res.length === keySize) {
-                    return res
-                }
-                var pad = new Uint8Array(keySize);
-                pad.set(res, keySize - res.length);
-                return pad
+            var iv = this.getInitVector(extra);
+            if (!iv) {
+                iv = this.newInitVector(extra)
             }
-            throw new ReferenceError('RSA encrypt error: ' + plaintext);
+            var ivWordArray = bytes2words(iv);
+            var key = this.getData();
+            var keyWordArray = bytes2words(key);
+            var message = bytes2words(plaintext);
+            var cipher = CryptoJS.AES.encrypt(message, keyWordArray, {iv: ivWordArray});
+            if (cipher.hasOwnProperty('ciphertext')) {
+                return words2bytes(cipher.ciphertext)
+            }
+            return null
+        }, decrypt: function (ciphertext, params) {
+            var iv = this.getInitVector(params);
+            if (!iv) {
+                iv = this.zeroInitVector()
+            }
+            var ivWordArray = bytes2words(iv);
+            var key = this.getData();
+            var keyWordArray = bytes2words(key);
+            var message = bytes2words(ciphertext);
+            var cipher = {ciphertext: message};
+            var plaintext = CryptoJS.AES.decrypt(cipher, keyWordArray, {iv: ivWordArray});
+            return words2bytes(plaintext)
         }
     });
-    var x509_header = new Uint8Array([48, -127, -97, 48, 13, 6, 9, 42, -122, 72, -122, -9, 13, 1, 1, 1, 5, 0, 3, -127, -115, 0]);
-    var parse_key = function () {
-        var der = this.getData();
-        var key = ns.format.Base64.encode(der);
-        var cipher = new JSEncrypt();
-        cipher.setPublicKey(key);
-        if (cipher.key.e === 0 || cipher.key.n === null) {
-            var fixed = new Uint8Array(x509_header.length + der.length);
-            fixed.set(x509_header);
-            fixed.set(der, x509_header.length);
-            key = ns.format.Base64.encode(fixed);
-            cipher.setPublicKey(key)
+    mk.crypto.AESKeyFactory = function () {
+        BaseObject.call(this)
+    };
+    var AESKeyFactory = mk.crypto.AESKeyFactory;
+    Class(AESKeyFactory, BaseObject, [SymmetricKeyFactory], null);
+    AESKeyFactory.prototype.generateSymmetricKey = function () {
+        return new AESKey({'algorithm': SymmetricAlgorithms.AES})
+    };
+    AESKeyFactory.prototype.parseSymmetricKey = function (key) {
+        if (key['data'] === null) {
+            return null
         }
-        return cipher
+        return new AESKey(key)
     };
-    ns.crypto.RSAPublicKey = RSAPublicKey
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var PublicKey = ns.crypto.PublicKey;
-    var DecryptKey = ns.crypto.DecryptKey;
-    var BasePrivateKey = ns.crypto.BasePrivateKey;
-    var RSAPrivateKey = function (key) {
-        BasePrivateKey.call(this, key)
-    };
-    Class(RSAPrivateKey, BasePrivateKey, [DecryptKey], {
-        getData: function () {
-            var data = this.getValue('data');
-            if (data) {
-                return ns.format.PEM.decodePrivateKey(data)
-            } else {
-                var bits = this.getSize() * 8;
-                var pem = generate.call(this, bits);
-                return ns.format.PEM.decodePrivateKey(pem)
-            }
-        }, getSize: function () {
-            var size = this.getValue('keySize');
-            if (size) {
-                return Number(size)
-            } else {
-                return 1024 / 8
-            }
-        }, getPublicKey: function () {
-            var key = ns.format.Base64.encode(this.getData());
-            var cipher = new JSEncrypt();
-            cipher.setPrivateKey(key);
-            var pem = cipher.getPublicKey();
-            var info = {
-                'algorithm': this.getValue('algorithm'),
-                'data': pem,
-                'mode': 'ECB',
-                'padding': 'PKCS1',
-                'digest': 'SHA256'
-            };
-            return PublicKey.parse(info)
-        }, sign: function (data) {
-            data = CryptoJS.enc.Hex.parse(ns.format.Hex.encode(data));
-            var cipher = parse_key.call(this);
-            var base64 = cipher.sign(data, CryptoJS.SHA256, 'sha256');
-            if (base64) {
-                return ns.format.Base64.decode(base64)
-            } else {
-                throw new ReferenceError('RSA sign error: ' + data);
-            }
-        }, decrypt: function (data, params) {
-            data = ns.format.Base64.encode(data);
-            var cipher = parse_key.call(this);
-            var string = cipher.decrypt(data);
-            if (string) {
-                return ns.format.UTF8.encode(string)
-            } else {
-                throw new ReferenceError('RSA decrypt error: ' + data);
-            }
-        }
-    });
-    var generate = function (bits) {
-        var cipher = new JSEncrypt({default_key_size: bits});
-        var key = cipher.getKey();
-        var pem = key.getPublicKey() + '\r\n' + key.getPrivateKey();
-        this.setValue('data', pem);
-        this.setValue('mode', 'ECB');
-        this.setValue('padding', 'PKCS1');
-        this.setValue('digest', 'SHA256');
-        return pem
-    };
-    var parse_key = function () {
-        var der = this.getData();
-        var key = ns.format.Base64.encode(der);
-        var cipher = new JSEncrypt();
-        cipher.setPrivateKey(key);
-        return cipher
-    };
-    ns.crypto.RSAPrivateKey = RSAPrivateKey
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Secp256k1 = window.Secp256k1;
-    var Class = ns.type.Class;
-    var BasePublicKey = ns.crypto.BasePublicKey;
     var mem_cpy = function (dst, dst_offset, src, src_offset, src_len) {
         for (var i = 0; i < src_len; ++i) {
             dst[dst_offset + i] = src[src_offset + i]
@@ -888,79 +852,6 @@
             return null
         }
     };
-    var ECCPublicKey = function (key) {
-        BasePublicKey.call(this, key)
-    };
-    Class(ECCPublicKey, BasePublicKey, null, {
-        getData: function () {
-            var pem = this.getValue('data');
-            if (!pem || pem.length === 0) {
-                throw new ReferenceError('ECC public key data not found');
-            } else if (pem.length === 66) {
-                return ns.format.Hex.decode(pem)
-            } else if (pem.length === 130) {
-                return ns.format.Hex.decode(pem)
-            } else {
-                var pos1 = pem.indexOf('-----BEGIN PUBLIC KEY-----');
-                if (pos1 >= 0) {
-                    pos1 += '-----BEGIN PUBLIC KEY-----'.length;
-                    var pos2 = pem.indexOf('-----END PUBLIC KEY-----', pos1);
-                    if (pos2 > 0) {
-                        var base64 = pem.substr(pos1, pos2 - pos1);
-                        var data = ns.format.Base64.decode(base64);
-                        return data.subarray(data.length - 65)
-                    }
-                }
-            }
-            throw new EvalError('key data error: ' + pem);
-        }, getSize: function () {
-            var size = this.getValue('keySize');
-            if (size) {
-                return Number(size)
-            } else {
-                return this.getData().length / 8
-            }
-        }, verify: function (data, signature) {
-            var hash = ns.digest.SHA256.digest(data);
-            var z = Secp256k1.uint256(hash, 16);
-            var sig = ecc_der_to_sig(signature, signature.length);
-            if (!sig) {
-                throw new EvalError('signature error: ' + signature);
-            }
-            var sig_r = Secp256k1.uint256(sig.r, 16);
-            var sig_s = Secp256k1.uint256(sig.s, 16);
-            var pub = decode_points(this.getData());
-            return Secp256k1.ecverify(pub.x, pub.y, sig_r, sig_s, z)
-        }
-    });
-    var decode_points = function (data) {
-        var x, y;
-        if (data.length === 65) {
-            if (data[0] === 4) {
-                x = Secp256k1.uint256(data.subarray(1, 33), 16);
-                y = Secp256k1.uint256(data.subarray(33, 65), 16)
-            } else {
-                throw new EvalError('key data head error: ' + data);
-            }
-        } else if (data.length === 33) {
-            if (data[0] === 4) {
-                x = Secp256k1.uint256(data.subarray(1, 33), 16);
-                y = Secp256k1.decompressKey(x, 0)
-            } else {
-                throw new EvalError('key data head error: ' + data);
-            }
-        } else {
-            throw new EvalError('key data length error: ' + data);
-        }
-        return {x: x, y: y}
-    };
-    ns.crypto.ECCPublicKey = ECCPublicKey
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var PublicKey = ns.crypto.PublicKey;
-    var BasePrivateKey = ns.crypto.BasePrivateKey;
     var ecc_sig_to_der = function (sig_r, sig_s, der) {
         var i;
         var p = 0, len, len1, len2;
@@ -1012,24 +903,112 @@
         der[len] = der[len1] + der[len2] + 4;
         return der[len] + 2
     };
-    var ECCPrivateKey = function (key) {
+    var decode_points = function (data) {
+        var x, y;
+        if (data.length === 65) {
+            if (data[0] === 4) {
+                x = Secp256k1.uint256(data.subarray(1, 33), 16);
+                y = Secp256k1.uint256(data.subarray(33, 65), 16)
+            } else {
+                throw new EvalError('key data head error: ' + data);
+            }
+        } else if (data.length === 33) {
+            if (data[0] === 4) {
+                x = Secp256k1.uint256(data.subarray(1, 33), 16);
+                y = Secp256k1.decompressKey(x, 0)
+            } else {
+                throw new EvalError('key data head error: ' + data);
+            }
+        } else {
+            throw new EvalError('key data length error: ' + data);
+        }
+        return {x: x, y: y}
+    };
+    var ecc_generate_private_key = function (bits) {
+        var key = window.crypto.getRandomValues(new Uint8Array(bits / 8))
+        var hex = Hex.encode(key);
+        this.setValue('data', hex);
+        this.setValue('curve', 'secp256k1');
+        this.setValue('digest', 'SHA256');
+        return key
+    };
+    mk.crypto.ECCPublicKey = function (key) {
+        BasePublicKey.call(this, key)
+    };
+    var ECCPublicKey = mk.crypto.ECCPublicKey;
+    Class(ECCPublicKey, BasePublicKey, null, {
+        getData: function () {
+            var pem = this.getValue('data');
+            if (!pem || pem.length === 0) {
+                throw new ReferenceError('ECC public key data not found');
+            } else if (pem.length === 66) {
+                return Hex.decode(pem)
+            } else if (pem.length === 130) {
+                return Hex.decode(pem)
+            } else {
+                var pos1 = pem.indexOf('-----BEGIN PUBLIC KEY-----');
+                if (pos1 >= 0) {
+                    pos1 += '-----BEGIN PUBLIC KEY-----'.length;
+                    var pos2 = pem.indexOf('-----END PUBLIC KEY-----', pos1);
+                    if (pos2 > 0) {
+                        var base64 = pem.substr(pos1, pos2 - pos1);
+                        var data = Base64.decode(base64);
+                        return data.subarray(data.length - 65)
+                    }
+                }
+            }
+            throw new EvalError('key data error: ' + pem);
+        }, getKeySize: function () {
+            var size = this.getInt('keySize', null);
+            if (size) {
+                return size
+            } else {
+                return this.getData().length / 8
+            }
+        }, verify: function (data, signature) {
+            var hash = SHA256.digest(data);
+            var z = Secp256k1.uint256(hash, 16);
+            var sig = ecc_der_to_sig(signature, signature.length);
+            if (!sig) {
+                throw new EvalError('signature error: ' + signature);
+            }
+            var sig_r = Secp256k1.uint256(sig.r, 16);
+            var sig_s = Secp256k1.uint256(sig.s, 16);
+            var pub = decode_points(this.getData());
+            return Secp256k1.ecverify(pub.x, pub.y, sig_r, sig_s, z)
+        }
+    });
+    mk.crypto.ECCPrivateKey = function (key) {
         BasePrivateKey.call(this, key);
-        var keyPair = get_key_pair.call(this);
+        var keyPair = this.keyPair();
         this.__privateKey = keyPair.privateKey;
         this.__publicKey = keyPair.publicKey
     };
+    var ECCPrivateKey = mk.crypto.ECCPrivateKey;
     Class(ECCPrivateKey, BasePrivateKey, null, {
         getData: function () {
             var data = this.getValue('data');
             if (data && data.length > 0) {
-                return ns.format.Hex.decode(data)
+                return Hex.decode(data)
             } else {
                 throw new ReferenceError('ECC private key data not found');
             }
-        }, getSize: function () {
-            var size = this.getValue('keySize');
+        }, keyPair: function () {
+            var sKey;
+            var data = this.getData();
+            if (!data || data.length === 0) {
+                sKey = ecc_generate_private_key(256)
+            } else if (data.length === 32) {
+                sKey = Secp256k1.uint256(data, 16)
+            } else {
+                throw new EvalError('key data length error: ' + data);
+            }
+            var pKey = Secp256k1.generatePublicKeyFromPrivateKeyData(sKey);
+            return {privateKey: sKey, publicKey: pKey}
+        }, getKeySize: function () {
+            var size = this.getInt('keySize', null);
             if (size) {
-                return Number(size)
+                return size
             } else {
                 return this.getData().length / 8
             }
@@ -1044,11 +1023,11 @@
             };
             return PublicKey.parse(info)
         }, sign: function (data) {
-            var hash = ns.digest.SHA256.digest(data);
+            var hash = SHA256.digest(data);
             var z = Secp256k1.uint256(hash, 16);
             var sig = Secp256k1.ecsign(this.__privateKey, z);
-            var sig_r = ns.format.Hex.decode(sig.r);
-            var sig_s = ns.format.Hex.decode(sig.s);
+            var sig_r = Hex.decode(sig.r);
+            var sig_s = Hex.decode(sig.s);
             var der = new Uint8Array(72);
             var sig_len = ecc_sig_to_der(sig_r, sig_s, der);
             if (sig_len === der.length) {
@@ -1058,189 +1037,111 @@
             }
         }
     });
-    var get_key_pair = function () {
-        var sKey;
-        var data = this.getData();
-        if (!data || data.length === 0) {
-            sKey = generatePrivateKey.call(this, 256)
-        } else if (data.length === 32) {
-            sKey = Secp256k1.uint256(data, 16)
-        } else {
-            throw new EvalError('key data length error: ' + data);
+    mk.crypto.ECCPrivateKeyFactory = function () {
+        BaseObject.call(this)
+    };
+    var ECCPrivateKeyFactory = mk.crypto.ECCPrivateKeyFactory;
+    Class(ECCPrivateKeyFactory, BaseObject, [PrivateKeyFactory], null);
+    ECCPrivateKeyFactory.prototype.generatePrivateKey = function () {
+        return new ECCPrivateKey({'algorithm': AsymmetricAlgorithms.ECC})
+    };
+    ECCPrivateKeyFactory.prototype.parsePrivateKey = function (key) {
+        if (key['data'] === null) {
+            return null
         }
-        var pKey = Secp256k1.generatePublicKeyFromPrivateKeyData(sKey);
-        return {privateKey: sKey, publicKey: pKey}
+        return new ECCPrivateKey(key)
     };
-    var generatePrivateKey = function (bits) {
-        var key = window.crypto.getRandomValues(new Uint8Array(bits / 8))
-        var hex = ns.format.Hex.encode(key);
-        this.setValue('data', hex);
-        this.setValue('curve', 'secp256k1');
-        this.setValue('digest', 'SHA256');
-        return key
+    mk.crypto.ECCPublicKeyFactory = function () {
+        BaseObject.call(this)
     };
-    ns.crypto.ECCPrivateKey = ECCPrivateKey
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var TransportableData = ns.format.TransportableData;
-    var BaseSymmetricKey = ns.crypto.BaseSymmetricKey;
-    var bytes2words = function (data) {
-        var string = ns.format.Hex.encode(data);
-        return CryptoJS.enc.Hex.parse(string)
-    };
-    var words2bytes = function (array) {
-        var result = array.toString();
-        return ns.format.Hex.decode(result)
-    };
-    var random_data = function (size) {
-        var data = new Uint8Array(size);
-        for (var i = 0; i < size; ++i) {
-            data[i] = Math.floor(Math.random() * 256)
+    var ECCPublicKeyFactory = mk.crypto.ECCPublicKeyFactory;
+    Class(ECCPublicKeyFactory, BaseObject, [PublicKeyFactory], null);
+    ECCPublicKeyFactory.prototype.parsePublicKey = function (key) {
+        if (key['data'] === null) {
+            return null
         }
-        return data
+        return new ECCPublicKey(key)
     };
-    var zero_data = function (size) {
-        return new Uint8Array(size)
-    };
-    var AESKey = function (key) {
-        BaseSymmetricKey.call(this, key);
-        var base64 = this.getValue('data');
-        if (base64) {
-            this.__tedKey = null
-        } else {
-            this.__tedKey = this.generateKeyData()
-        }
-    };
-    Class(AESKey, BaseSymmetricKey, null, {
-        generateKeyData: function () {
-            var keySize = this.getKeySize();
-            var pwd = random_data(keySize);
-            var ted = TransportableData.create(pwd);
-            this.setValue('data', ted.toObject());
-            return ted
-        }, getKeySize: function () {
-            return this.getInt('keySize', 32)
-        }, getBlockSize: function () {
-            return this.getInt('blockSize', 16)
-        }, getData: function () {
-            var ted = this.__tedKey;
-            if (!ted) {
-                var base64 = this.getValue('data');
-                ted = TransportableData.parse(base64);
-                this.__tedKey = ted
-            }
-            return !ted ? null : ted.getData()
-        }, getIVString: function (params) {
-            var base64 = params['IV'];
-            if (base64 && base64.length > 0) {
-                return base64
-            }
-            base64 = params['iv'];
-            if (base64 && base64.length > 0) {
-                return base64
-            }
-            base64 = this.getString('iv', null);
-            if (base64 && base64.length > 0) {
-                return base64
-            }
-            return this.getString('IV', null)
-        }, getIVData: function (params) {
-            if (!params) {
-                throw new SyntaxError('params must provided to fetch IV for AES');
-            }
-            var base64 = this.getIVString(params);
-            var ted = TransportableData.parse(base64);
-            var ivData = !ted ? null : ted.getData();
-            if (ivData) {
-                return ivData
-            }
-            var blockSize = this.getBlockSize();
-            return zero_data(blockSize)
-        }, newIVData: function (extra) {
-            if (!extra) {
-                throw new SyntaxError('extra dict must provided to store IV for AES');
-            }
-            var blockSize = this.getBlockSize();
-            var ivData = random_data(blockSize);
-            var ted = TransportableData.create(ivData);
-            extra['IV'] = ted.toObject();
-            return ivData
-        }, encrypt: function (plaintext, extra) {
-            var message = bytes2words(plaintext);
-            var iv = this.newIVData(extra);
-            var ivWordArray = bytes2words(iv);
-            var key = this.getData();
-            var keyWordArray = bytes2words(key);
-            try {
-                var cipher = CryptoJS.AES.encrypt(message, keyWordArray, {iv: ivWordArray});
-                if (cipher.hasOwnProperty('ciphertext')) {
-                    return words2bytes(cipher.ciphertext)
+    var MIME_LINE_MAX_LEN = 76;
+    var CR_LF = '\r\n';
+    var rfc2045 = function (data) {
+        var base64 = Base64.encode(data);
+        var length = base64.length;
+        if (length > MIME_LINE_MAX_LEN && base64.indexOf(CR_LF) < 0) {
+            var sb = '';
+            var start = 0, end;
+            for (; start < length; start += MIME_LINE_MAX_LEN) {
+                end = start + MIME_LINE_MAX_LEN;
+                if (end < length) {
+                    sb += base64.substring(start, end);
+                    sb += CR_LF
+                } else {
+                    sb += base64.substring(start, length);
+                    break
                 }
-            } catch (e) {
-                return null
             }
-        }, decrypt: function (ciphertext, params) {
-            var message = bytes2words(ciphertext);
-            var iv = this.getIVData(params);
-            var ivWordArray = bytes2words(iv);
-            var key = this.getData();
-            var keyWordArray = bytes2words(key);
-            var cipher = {ciphertext: message};
-            try {
-                var plaintext = CryptoJS.AES.decrypt(cipher, keyWordArray, {iv: ivWordArray});
-                return words2bytes(plaintext)
-            } catch (e) {
-                return null
-            }
+            base64 = sb
         }
-    });
-    ns.crypto.AESKey = AESKey
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var SymmetricKey = ns.crypto.SymmetricKey;
-    var Password = function () {
-        Object.call(this)
+        return base64
     };
-    Class(Password, Object, null, null);
-    Password.KEY_SIZE = 32;
-    Password.BLOCK_SIZE = 16;
-    Password.generate = function (password) {
-        var data = ns.format.UTF8.encode(password);
-        var digest = ns.digest.SHA256.digest(data);
-        var filling = Password.KEY_SIZE - data.length;
-        if (filling > 0) {
-            var merged = new Uint8Array(Password.KEY_SIZE);
-            merged.set(digest.subarray(0, filling));
-            merged.set(data, filling);
-            data = merged
-        } else if (filling < 0) {
-            if (Password.KEY_SIZE === digest.length) {
-                data = digest
-            } else {
-                data = digest.subarray(0, Password.KEY_SIZE)
-            }
+    var encode_key = function (key, left, right) {
+        var content = rfc2045(key);
+        return left + CR_LF + content + CR_LF + right
+    };
+    var decode_key = function (pem, left, right) {
+        var start = pem.indexOf(left);
+        if (start < 0) {
+            return null
         }
-        var iv = digest.subarray(digest.length - Password.BLOCK_SIZE, digest.length);
-        var key = {
-            'algorithm': SymmetricKey.AES,
-            'data': ns.format.Base64.encode(data),
-            'iv': ns.format.Base64.encode(iv)
-        };
-        return SymmetricKey.parse(key)
+        start += left.length;
+        var end = pem.indexOf(right, start);
+        if (end < start) {
+            return null
+        }
+        return Base64.decode(pem.substring(start, end))
     };
-    ns.crypto.Password = Password
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var BaseSymmetricKey = ns.crypto.BaseSymmetricKey;
-    var PlainKey = function (key) {
+    var encode_public = function (key) {
+        return encode_key(key, '-----BEGIN PUBLIC KEY-----', '-----END PUBLIC KEY-----')
+    };
+    var encode_rsa_private = function (key) {
+        return encode_key(key, '-----BEGIN RSA PRIVATE KEY-----', '-----END RSA PRIVATE KEY-----')
+    };
+    var decode_public = function (pem) {
+        var data = decode_key(pem, '-----BEGIN PUBLIC KEY-----', '-----END PUBLIC KEY-----');
+        if (!data) {
+            data = decode_key(pem, "-----BEGIN RSA PUBLIC KEY-----", "-----END RSA PUBLIC KEY-----")
+        }
+        if (data) {
+            return data
+        }
+        if (pem.indexOf('PRIVATE KEY') > 0) {
+            throw new TypeError('this is a private key content');
+        } else {
+            return Base64.decode(pem)
+        }
+    };
+    var decode_rsa_private = function (pem) {
+        var data = decode_key(pem, '-----BEGIN RSA PRIVATE KEY-----', '-----END RSA PRIVATE KEY-----');
+        if (data) {
+            return data
+        }
+        if (pem.indexOf('PUBLIC KEY') > 0) {
+            throw new TypeError('this is not a RSA private key content');
+        } else {
+            return Base64.decode(pem)
+        }
+    };
+    mk.format.PEM = {
+        encodePublicKey: encode_public,
+        encodePrivateKey: encode_rsa_private,
+        decodePublicKey: decode_public,
+        decodePrivateKey: decode_rsa_private
+    };
+    var PEM = mk.format.PEM;
+    mk.crypto.PlainKey = function (key) {
         BaseSymmetricKey.call(this, key)
     };
+    var PlainKey = mk.crypto.PlainKey;
     Class(PlainKey, BaseSymmetricKey, null, {
         getData: function () {
             return null
@@ -1250,126 +1151,226 @@
             return data
         }
     });
-    var plain_key = null;
     PlainKey.getInstance = function () {
         if (!plain_key) {
-            var key = {'algorithm': PlainKey.PLAIN};
+            var key = {'algorithm': SymmetricAlgorithms.PLAIN};
             plain_key = new PlainKey(key)
         }
         return plain_key
     };
-    PlainKey.PLAIN = 'PLAIN';
-    ns.crypto.PlainKey = PlainKey
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var AsymmetricKey = ns.crypto.AsymmetricKey;
-    var PrivateKey = ns.crypto.PrivateKey;
-    var PublicKey = ns.crypto.PublicKey;
-    var ECCPrivateKey = ns.crypto.ECCPrivateKey;
-    var ECCPublicKey = ns.crypto.ECCPublicKey;
-    var ECCPrivateKeyFactory = function () {
-        Object.call(this)
+    var plain_key = null;
+    mk.crypto.PlainKeyFactory = function () {
+        BaseObject.call(this)
     };
-    Class(ECCPrivateKeyFactory, Object, [PrivateKey.Factory], null);
-    ECCPrivateKeyFactory.prototype.generatePrivateKey = function () {
-        return this.parsePrivateKey({'algorithm': AsymmetricKey.ECC})
-    };
-    ECCPrivateKeyFactory.prototype.parsePrivateKey = function (key) {
-        return new ECCPrivateKey(key)
-    };
-    var ECCPublicKeyFactory = function () {
-        Object.call(this)
-    };
-    Class(ECCPublicKeyFactory, Object, [PublicKey.Factory], null);
-    ECCPublicKeyFactory.prototype.parsePublicKey = function (key) {
-        return new ECCPublicKey(key)
-    };
-    ns.crypto.ECCPrivateKeyFactory = ECCPrivateKeyFactory;
-    ns.crypto.ECCPublicKeyFactory = ECCPublicKeyFactory
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var AsymmetricKey = ns.crypto.AsymmetricKey;
-    var PrivateKey = ns.crypto.PrivateKey;
-    var PublicKey = ns.crypto.PublicKey;
-    var RSAPrivateKey = ns.crypto.RSAPrivateKey;
-    var RSAPublicKey = ns.crypto.RSAPublicKey;
-    var RSAPrivateKeyFactory = function () {
-        Object.call(this)
-    };
-    Class(RSAPrivateKeyFactory, Object, [PrivateKey.Factory], null);
-    RSAPrivateKeyFactory.prototype.generatePrivateKey = function () {
-        return this.parsePrivateKey({'algorithm': AsymmetricKey.RSA})
-    };
-    RSAPrivateKeyFactory.prototype.parsePrivateKey = function (key) {
-        return new RSAPrivateKey(key)
-    };
-    var RSAPublicKeyFactory = function () {
-        Object.call(this)
-    };
-    Class(RSAPublicKeyFactory, Object, [PublicKey.Factory], null);
-    RSAPublicKeyFactory.prototype.parsePublicKey = function (key) {
-        return new RSAPublicKey(key)
-    };
-    ns.crypto.RSAPrivateKeyFactory = RSAPrivateKeyFactory;
-    ns.crypto.RSAPublicKeyFactory = RSAPublicKeyFactory
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var SymmetricKey = ns.crypto.SymmetricKey;
-    var AESKey = ns.crypto.AESKey;
-    var AESKeyFactory = function () {
-        Object.call(this)
-    };
-    Class(AESKeyFactory, Object, [SymmetricKey.Factory], null);
-    AESKeyFactory.prototype.generateSymmetricKey = function () {
-        return this.parseSymmetricKey({'algorithm': SymmetricKey.AES})
-    };
-    AESKeyFactory.prototype.parseSymmetricKey = function (key) {
-        return new AESKey(key)
-    };
-    ns.crypto.AESKeyFactory = AESKeyFactory
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var SymmetricKey = ns.crypto.SymmetricKey;
-    var PlainKey = ns.crypto.PlainKey;
-    var PlainKeyFactory = function () {
-        Object.call(this)
-    };
-    Class(PlainKeyFactory, Object, [SymmetricKey.Factory], null);
+    var PlainKeyFactory = mk.crypto.PlainKeyFactory;
+    Class(PlainKeyFactory, BaseObject, [SymmetricKey.Factory], null);
     PlainKeyFactory.prototype.generateSymmetricKey = function () {
         return PlainKey.getInstance()
     };
     PlainKeyFactory.prototype.parseSymmetricKey = function (key) {
         return PlainKey.getInstance()
     };
-    ns.crypto.PlainKeyFactory = PlainKeyFactory
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var Enum = ns.type.Enum;
-    var ConstantString = ns.type.ConstantString;
-    var Base58 = ns.format.Base58;
-    var SHA256 = ns.digest.SHA256;
-    var RIPEMD160 = ns.digest.RIPEMD160;
-    var Address = ns.protocol.Address;
-    var BTCAddress = function (string, network) {
+    var x509_header = new Uint8Array([48, -127, -97, 48, 13, 6, 9, 42, -122, 72, -122, -9, 13, 1, 1, 1, 5, 0, 3, -127, -115, 0]);
+    var rsa_public_key = function (der) {
+        var key = Base64.encode(der);
+        var cipher = new JSEncrypt();
+        cipher.setPublicKey(key);
+        if (cipher.key.e === 0 || cipher.key.n === null) {
+            var fixed = new Uint8Array(x509_header.length + der.length);
+            fixed.set(x509_header);
+            fixed.set(der, x509_header.length);
+            key = Base64.encode(fixed);
+            cipher.setPublicKey(key)
+        }
+        return cipher
+    };
+    var rsa_private_key = function (der) {
+        var key = Base64.encode(der);
+        var cipher = new JSEncrypt();
+        cipher.setPrivateKey(key);
+        return cipher
+    };
+    var rsa_generate_keys = function (bits) {
+        var cipher = new JSEncrypt({default_key_size: bits});
+        var key = cipher.getKey();
+        return key.getPublicKey() + '\r\n' + key.getPrivateKey()
+    }
+    mk.crypto.RSAPublicKey = function (key) {
+        BasePublicKey.call(this, key)
+    };
+    var RSAPublicKey = mk.crypto.RSAPublicKey;
+    Class(RSAPublicKey, BasePublicKey, [EncryptKey], {
+        getData: function () {
+            var data = this.getValue('data');
+            if (data) {
+                return PEM.decodePublicKey(data)
+            } else {
+                throw new ReferenceError('RSA public key data not found');
+            }
+        }, getKeySize: function () {
+            return this.getInt('keySize', 1024 / 8)
+        }, verify: function (data, signature) {
+            data = CryptoJS.enc.Hex.parse(Hex.encode(data));
+            signature = Base64.encode(signature);
+            var cipher = rsa_public_key(this.getData());
+            return cipher.verify(data, signature, CryptoJS.SHA256)
+        }, encrypt: function (plaintext, extra) {
+            plaintext = UTF8.decode(plaintext);
+            var cipher = rsa_public_key(this.getData());
+            var base64 = cipher.encrypt(plaintext);
+            if (base64) {
+                var keySize = this.getKeySize();
+                var res = Base64.decode(base64);
+                if (res.length === keySize) {
+                    return res
+                }
+                var pad = new Uint8Array(keySize);
+                pad.set(res, keySize - res.length);
+                return pad
+            }
+            throw new ReferenceError('RSA encrypt error: ' + plaintext);
+        }
+    });
+    mk.crypto.RSAPrivateKey = function (key) {
+        BasePrivateKey.call(this, key);
+        var pem = this.getValue('data');
+        if (!pem) {
+            this.generateKeys()
+        }
+    };
+    var RSAPrivateKey = mk.crypto.RSAPrivateKey;
+    Class(RSAPrivateKey, BasePrivateKey, [DecryptKey], {
+        getData: function () {
+            var data = this.getValue('data');
+            if (data) {
+                return PEM.decodePrivateKey(data)
+            } else {
+                throw new ReferenceError('RSA private key data not found');
+            }
+        }, generateKeys: function () {
+            var bits = this.getKeySize() * 8;
+            var pem = rsa_generate_keys(bits);
+            this.setValue('data', pem);
+            this.setValue('mode', 'ECB');
+            this.setValue('padding', 'PKCS1');
+            this.setValue('digest', 'SHA256');
+            return pem
+        }, getKeySize: function () {
+            return this.getInt('keySize', 1024 / 8)
+        }, getPublicKey: function () {
+            var cipher = rsa_private_key(this.getData());
+            var pem = cipher.getPublicKey();
+            var info = {
+                'algorithm': this.getValue('algorithm'),
+                'data': pem,
+                'mode': 'ECB',
+                'padding': 'PKCS1',
+                'digest': 'SHA256'
+            };
+            return PublicKey.parse(info)
+        }, sign: function (data) {
+            data = CryptoJS.enc.Hex.parse(Hex.encode(data));
+            var cipher = rsa_private_key(this.getData());
+            var base64 = cipher.sign(data, CryptoJS.SHA256, 'sha256');
+            if (base64) {
+                return Base64.decode(base64)
+            } else {
+                throw new ReferenceError('RSA sign error: ' + data);
+            }
+        }, decrypt: function (data, params) {
+            data = Base64.encode(data);
+            var cipher = rsa_private_key(this.getData());
+            var string = cipher.decrypt(data);
+            if (string) {
+                return UTF8.encode(string)
+            } else {
+                throw new ReferenceError('RSA decrypt error: ' + data);
+            }
+        }
+    });
+    mk.crypto.RSAPrivateKeyFactory = function () {
+        BaseObject.call(this)
+    };
+    var RSAPrivateKeyFactory = mk.crypto.RSAPrivateKeyFactory;
+    Class(RSAPrivateKeyFactory, BaseObject, [PrivateKeyFactory], null);
+    RSAPrivateKeyFactory.prototype.generatePrivateKey = function () {
+        return new RSAPrivateKey({'algorithm': AsymmetricAlgorithms.RSA})
+    };
+    RSAPrivateKeyFactory.prototype.parsePrivateKey = function (key) {
+        if (key['data'] === null) {
+            return null
+        }
+        return new RSAPrivateKey(key)
+    };
+    mk.crypto.RSAPublicKeyFactory = function () {
+        BaseObject.call(this)
+    };
+    var RSAPublicKeyFactory = mk.crypto.RSAPublicKeyFactory;
+    Class(RSAPublicKeyFactory, BaseObject, [PublicKeyFactory], null);
+    RSAPublicKeyFactory.prototype.parsePublicKey = function (key) {
+        if (key['data'] === null) {
+            return null
+        }
+        return new RSAPublicKey(key)
+    };
+    mkm.mkm.BaseAddressFactory = function () {
+        BaseObject.call(this);
+        this._addresses = {}
+    };
+    var BaseAddressFactory = mkm.mkm.BaseAddressFactory;
+    Class(BaseAddressFactory, BaseObject, [AddressFactory], null);
+    BaseAddressFactory.prototype.generateAddress = function (meta, network) {
+        var address = meta.generateAddress(network);
+        if (address) {
+            this._addresses[address.toString()] = address
+        }
+        return address
+    };
+    BaseAddressFactory.prototype.parseAddress = function (string) {
+        var address = this._addresses[string];
+        if (!address) {
+            address = this.parse(string);
+            if (address) {
+                this._addresses[string] = address
+            }
+        }
+        return address
+    };
+    BaseAddressFactory.prototype.parse = function (string) {
+        if (!string) {
+            return null
+        }
+        var len = string.length;
+        if (len === 8) {
+            if (string.toLowerCase() === 'anywhere') {
+                return Address.ANYWHERE
+            }
+        } else if (len === 10) {
+            if (string.toLowerCase() === 'everywhere') {
+                return Address.EVERYWHERE
+            }
+        }
+        var res;
+        if (26 <= len && len <= 35) {
+            res = BTCAddress.parse(string)
+        } else if (len === 42) {
+            res = ETHAddress.parse(string)
+        } else {
+            res = null
+        }
+        return res
+    };
+    mkm.mkm.BTCAddress = function (string, network) {
         ConstantString.call(this, string);
-        this.__network = Enum.getInt(network)
+        this.__type = network
     };
-    Class(BTCAddress, ConstantString, [Address], null);
-    BTCAddress.prototype.getType = function () {
-        return this.__network
-    };
+    var BTCAddress = mkm.mkm.BTCAddress;
+    Class(BTCAddress, ConstantString, [Address], {
+        getType: function () {
+            return this.__type
+        }
+    });
     BTCAddress.generate = function (fingerprint, network) {
-        network = Enum.getInt(network);
         var digest = RIPEMD160.digest(SHA256.digest(fingerprint));
         var head = [];
         head.push(network);
@@ -1398,7 +1399,7 @@
         var prefix = data.subarray(0, 21);
         var suffix = data.subarray(21, 25);
         var cc = check_code(prefix);
-        if (ns.type.Arrays.equals(cc, suffix)) {
+        if (Arrays.equals(cc, suffix)) {
             return new BTCAddress(string, data[0])
         } else {
             return null
@@ -1408,21 +1409,75 @@
         var sha256d = SHA256.digest(SHA256.digest(data));
         return sha256d.subarray(0, 4)
     };
-    ns.mkm.BTCAddress = BTCAddress
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var ConstantString = ns.type.ConstantString;
-    var EntityType = ns.protocol.EntityType;
-    var Address = ns.protocol.Address;
-    var ETHAddress = function (string) {
+    mkm.mkm.GeneralDocumentFactory = function (type) {
+        BaseObject.call(this);
+        this.__type = type
+    };
+    var GeneralDocumentFactory = mkm.mkm.GeneralDocumentFactory;
+    Class(GeneralDocumentFactory, BaseObject, [DocumentFactory], null);
+    GeneralDocumentFactory.prototype.getType = function (docType, identifier) {
+        if (!identifier) {
+            return this.__type
+        } else if (docType !== null && docType !== '' && docType !== '*') {
+            return docType
+        } else if (identifier.isGroup()) {
+            return DocumentType.BULLETIN
+        } else if (identifier.isUser()) {
+            return DocumentType.VISA
+        } else {
+            return DocumentType.PROFILE
+        }
+    };
+    GeneralDocumentFactory.prototype.createDocument = function (identifier, data, signature) {
+        var type = this.getType(this.__type, identifier);
+        if (data && signature) {
+            if (type === DocumentType.VISA) {
+                return new BaseVisa(identifier, data, signature)
+            } else if (type === DocumentType.BULLETIN) {
+                return new BaseBulletin(identifier, data, signature)
+            } else {
+                return new BaseDocument(type, identifier, data, signature)
+            }
+        } else {
+            if (type === DocumentType.VISA) {
+                return new BaseVisa(identifier)
+            } else if (type === DocumentType.BULLETIN) {
+                return new BaseBulletin(identifier)
+            } else {
+                return new BaseDocument(type, identifier)
+            }
+        }
+    };
+    GeneralDocumentFactory.prototype.parseDocument = function (doc) {
+        var identifier = ID.parse(doc['did']);
+        if (!identifier) {
+            return null
+        } else if (doc['data'] && doc['signature']) {
+        } else {
+            return null
+        }
+        var helper = SharedAccountExtensions.getHelper();
+        var type = helper.getDocumentType(doc, null);
+        if (!type) {
+            type = this.getType('*', identifier)
+        }
+        if (type === DocumentType.VISA) {
+            return new BaseVisa(doc)
+        } else if (type === DocumentType.BULLETIN) {
+            return new BaseBulletin(doc)
+        } else {
+            return new BaseDocument(doc)
+        }
+    };
+    mkm.mkm.ETHAddress = function (string) {
         ConstantString.call(this, string)
     };
-    Class(ETHAddress, ConstantString, [Address], null);
-    ETHAddress.prototype.getType = function () {
-        return EntityType.USER.getValue()
-    };
+    var ETHAddress = mkm.mkm.ETHAddress;
+    Class(ETHAddress, ConstantString, [Address], {
+        getType: function () {
+            return EntityType.USER.getValue()
+        }
+    });
     ETHAddress.getValidateAddress = function (address) {
         if (!is_eth(address)) {
             return null
@@ -1439,9 +1494,9 @@
         } else if (fingerprint.length !== 64) {
             throw new TypeError('ECC key data error: ' + fingerprint);
         }
-        var digest = ns.digest.KECCAK256.digest(fingerprint);
+        var digest = Keccak256.digest(fingerprint);
         var tail = digest.subarray(digest.length - 20);
-        var address = ns.format.Hex.encode(tail);
+        var address = Hex.encode(tail);
         return new ETHAddress('0x' + eip55(address))
     };
     ETHAddress.parse = function (address) {
@@ -1452,7 +1507,7 @@
     };
     var eip55 = function (hex) {
         var sb = new Uint8Array(40);
-        var hash = ns.digest.KECCAK256.digest(ns.format.UTF8.encode(hex));
+        var hash = Keccak256.digest(UTF8.encode(hex));
         var ch;
         var _9 = '9'.charCodeAt(0);
         for (var i = 0; i < 40; ++i) {
@@ -1462,7 +1517,7 @@
             }
             sb[i] = ch
         }
-        return ns.format.UTF8.decode(sb)
+        return UTF8.decode(sb)
     };
     var is_eth = function (address) {
         if (address.length !== 42) {
@@ -1470,12 +1525,6 @@
         } else if (address.charAt(0) !== '0' || address.charAt(1) !== 'x') {
             return false
         }
-        var _0 = '0'.charCodeAt(0);
-        var _9 = '9'.charCodeAt(0);
-        var _A = 'A'.charCodeAt(0);
-        var _Z = 'Z'.charCodeAt(0);
-        var _a = 'a'.charCodeAt(0);
-        var _z = 'z'.charCodeAt(0);
         var ch;
         for (var i = 2; i < 42; ++i) {
             ch = address.charCodeAt(i);
@@ -1492,117 +1541,40 @@
         }
         return true
     };
-    ns.mkm.ETHAddress = ETHAddress
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var Address = ns.protocol.Address;
-    var BaseAddressFactory = function () {
-        Object.call(this);
-        this.__addresses = {}
+    var _0 = '0'.charCodeAt(0);
+    var _9 = '9'.charCodeAt(0);
+    var _A = 'A'.charCodeAt(0);
+    var _Z = 'Z'.charCodeAt(0);
+    var _a = 'a'.charCodeAt(0);
+    var _z = 'z'.charCodeAt(0);
+    mkm.mkm.IdentifierFactory = function () {
+        BaseObject.call(this);
+        this._identifiers = {}
     };
-    Class(BaseAddressFactory, Object, [Address.Factory], null);
-    BaseAddressFactory.prototype.reduceMemory = function () {
-        var finger = 0;
-        finger = thanos(this.__addresses, finger);
-        return finger >> 1
-    };
-    BaseAddressFactory.prototype.generateAddress = function (meta, network) {
-        var address = meta.generateAddress(network);
-        if (address) {
-            this.__addresses[address.toString()] = address
-        }
-        return address
-    };
-    BaseAddressFactory.prototype.parseAddress = function (string) {
-        var address = this.__addresses[string];
-        if (!address) {
-            address = Address.create(string);
-            if (address) {
-                this.__addresses[string] = address
-            }
-        }
-        return address
-    };
-    var thanos = ns.mkm.thanos;
-    ns.mkm.BaseAddressFactory = BaseAddressFactory
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var Address = ns.protocol.Address;
-    var BaseAddressFactory = ns.mkm.BaseAddressFactory;
-    var BTCAddress = ns.mkm.BTCAddress;
-    var ETHAddress = ns.mkm.ETHAddress;
-    var GeneralAddressFactory = function () {
-        BaseAddressFactory.call(this)
-    };
-    Class(GeneralAddressFactory, BaseAddressFactory, null, null);
-    GeneralAddressFactory.prototype.createAddress = function (address) {
-        if (!address) {
-            return null
-        }
-        var len = address.length;
-        if (len === 8) {
-            if (address.toLowerCase() === 'anywhere') {
-                return Address.ANYWHERE
-            }
-        } else if (len === 10) {
-            if (address.toLowerCase() === 'everywhere') {
-                return Address.EVERYWHERE
-            }
-        }
-        var res;
-        if (26 <= len && len <= 35) {
-            res = BTCAddress.parse(address)
-        } else if (len === 42) {
-            res = ETHAddress.parse(address)
-        } else {
-            res = null
-        }
-        return res
-    };
-    ns.mkm.GeneralAddressFactory = GeneralAddressFactory
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var Address = ns.protocol.Address;
-    var ID = ns.protocol.ID;
-    var Identifier = ns.mkm.Identifier;
-    var IdentifierFactory = function () {
-        Object.call(this);
-        this.__identifiers = {}
-    };
-    Class(IdentifierFactory, Object, [ID.Factory], null);
-    IdentifierFactory.prototype.reduceMemory = function () {
-        var finger = 0;
-        finger = thanos(this.__identifiers, finger);
-        return finger >> 1
-    };
+    var IdentifierFactory = mkm.mkm.IdentifierFactory;
+    Class(IdentifierFactory, BaseObject, [IDFactory], null);
     IdentifierFactory.prototype.generateIdentifier = function (meta, network, terminal) {
         var address = Address.generate(meta, network);
         return ID.create(meta.getSeed(), address, terminal)
     };
     IdentifierFactory.prototype.createIdentifier = function (name, address, terminal) {
         var string = Identifier.concat(name, address, terminal);
-        var id = this.__identifiers[string];
-        if (!id) {
-            id = this.newID(string, name, address, terminal);
-            this.__identifiers[string] = id
+        var did = this._identifiers[string];
+        if (!did) {
+            did = this.newID(string, name, address, terminal);
+            this._identifiers[string] = did
         }
-        return id
+        return did
     }
     IdentifierFactory.prototype.parseIdentifier = function (identifier) {
-        var id = this.__identifiers[identifier];
-        if (!id) {
-            id = this.parse(identifier);
-            if (id) {
-                this.__identifiers[identifier] = id
+        var did = this._identifiers[identifier];
+        if (!did) {
+            did = this.parse(identifier);
+            if (did) {
+                this._identifiers[identifier] = did
             }
         }
-        return id
+        return did
     };
     IdentifierFactory.prototype.newID = function (string, name, address, terminal) {
         return new Identifier(string, name, address, terminal)
@@ -1628,16 +1600,7 @@
         }
         return this.newID(string, name, address, terminal)
     };
-    var thanos = ns.mkm.thanos;
-    ns.mkm.GeneralIdentifierFactory = IdentifierFactory
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var Enum = ns.type.Enum;
-    var BTCAddress = ns.mkm.BTCAddress;
-    var BaseMeta = ns.mkm.BaseMeta;
-    var DefaultMeta = function () {
+    mkm.mkm.DefaultMeta = function () {
         if (arguments.length === 1) {
             BaseMeta.call(this, arguments[0])
         } else if (arguments.length === 4) {
@@ -1647,11 +1610,11 @@
         }
         this.__addresses = {}
     };
+    var DefaultMeta = mkm.mkm.DefaultMeta;
     Class(DefaultMeta, BaseMeta, null, {
         hasSeed: function () {
             return true
         }, generateAddress: function (network) {
-            network = Enum.getInt(network);
             var cached = this.__addresses[network];
             if (!cached) {
                 var data = this.getFingerprint();
@@ -1661,15 +1624,7 @@
             return cached
         }
     });
-    ns.mkm.DefaultMeta = DefaultMeta
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var Enum = ns.type.Enum;
-    var BTCAddress = ns.mkm.BTCAddress;
-    var BaseMeta = ns.mkm.BaseMeta;
-    var BTCMeta = function () {
+    mkm.mkm.BTCMeta = function () {
         if (arguments.length === 1) {
             BaseMeta.call(this, arguments[0])
         } else if (arguments.length === 2) {
@@ -1681,11 +1636,11 @@
         }
         this.__addresses = {}
     };
+    var BTCMeta = mkm.mkm.BTCMeta;
     Class(BTCMeta, BaseMeta, null, {
         hasSeed: function () {
             return false
         }, generateAddress: function (network) {
-            network = Enum.getInt(network);
             var cached = this.__addresses[network];
             if (!cached) {
                 var key = this.getPublicKey();
@@ -1696,14 +1651,7 @@
             return cached
         }
     });
-    ns.mkm.BTCMeta = BTCMeta
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var ETHAddress = ns.mkm.ETHAddress;
-    var BaseMeta = ns.mkm.BaseMeta;
-    var ETHMeta = function () {
+    mkm.mkm.ETHMeta = function () {
         if (arguments.length === 1) {
             BaseMeta.call(this, arguments[0])
         } else if (arguments.length === 2) {
@@ -1715,6 +1663,7 @@
         }
         this.__address = null
     };
+    var ETHMeta = mkm.mkm.ETHMeta;
     Class(ETHMeta, BaseMeta, null, {
         hasSeed: function () {
             return false
@@ -1729,209 +1678,1013 @@
             return cached
         }
     });
-    ns.mkm.ETHMeta = ETHMeta
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var UTF8 = ns.format.UTF8;
-    var TransportableData = ns.format.TransportableData;
-    var Meta = ns.protocol.Meta;
-    var DefaultMeta = ns.mkm.DefaultMeta;
-    var BTCMeta = ns.mkm.BTCMeta;
-    var ETHMeta = ns.mkm.ETHMeta;
-    var GeneralMetaFactory = function (algorithm) {
-        Object.call(this);
+    mkm.mkm.BaseMetaFactory = function (algorithm) {
+        BaseObject.call(this);
         this.__type = algorithm
     };
-    Class(GeneralMetaFactory, Object, [Meta.Factory], null);
-    GeneralMetaFactory.prototype.getType = function () {
+    var BaseMetaFactory = mkm.mkm.BaseMetaFactory;
+    Class(BaseMetaFactory, BaseObject, [MetaFactory], null);
+    BaseMetaFactory.prototype.getType = function () {
         return this.__type
     };
-    GeneralMetaFactory.prototype.generateMeta = function (sKey, seed) {
+    BaseMetaFactory.prototype.generateMeta = function (sKey, seed) {
         var fingerprint = null;
         if (seed && seed.length > 0) {
-            var sig = sKey.sign(UTF8.encode(seed));
+            var data = UTF8.encode(seed);
+            var sig = sKey.sign(data);
             fingerprint = TransportableData.create(sig)
         }
         var pKey = sKey.getPublicKey();
         return this.createMeta(pKey, seed, fingerprint)
     };
-    GeneralMetaFactory.prototype.createMeta = function (key, seed, fingerprint) {
+    BaseMetaFactory.prototype.createMeta = function (pKey, seed, fingerprint) {
         var out;
         var type = this.getType();
-        if (type === Meta.MKM) {
-            out = new DefaultMeta(type, key, seed, fingerprint)
-        } else if (type === Meta.BTC) {
-            out = new BTCMeta(type, key)
-        } else if (type === Meta.ETH) {
-            out = new ETHMeta(type, key)
+        if (type === MetaType.MKM || 'mkm' === type) {
+            out = new DefaultMeta(type, pKey, seed, fingerprint)
+        } else if (type === MetaType.BTC || 'btc' === type) {
+            out = new BTCMeta(type, pKey)
+        } else if (type === MetaType.ETH || 'eth' === type) {
+            out = new ETHMeta(type, pKey)
         } else {
             throw new TypeError('unknown meta type: ' + type);
         }
         return out
     };
-    GeneralMetaFactory.prototype.parseMeta = function (meta) {
+    BaseMetaFactory.prototype.parseMeta = function (meta) {
         var out;
-        var gf = general_factory();
-        var type = gf.getMetaType(meta, '');
-        if (type === Meta.MKM) {
+        var helper = SharedAccountExtensions.getHelper();
+        var type = helper.getMetaType(meta, '');
+        if (type === MetaType.MKM || 'mkm' === type) {
             out = new DefaultMeta(meta)
-        } else if (type === Meta.BTC) {
+        } else if (type === MetaType.BTC || 'btc' === type) {
             out = new BTCMeta(meta)
-        } else if (type === Meta.ETH) {
+        } else if (type === MetaType.ETH || 'eth' === type) {
             out = new ETHMeta(meta)
         } else {
             throw new TypeError('unknown meta type: ' + type);
         }
         return out.isValid() ? out : null
     };
-    var general_factory = function () {
-        var man = ns.mkm.AccountFactoryManager;
-        return man.generalFactory
+    dkd.dkd.GeneralCommandFactory = function () {
+        BaseObject.call(this)
     };
-    ns.mkm.GeneralMetaFactory = GeneralMetaFactory
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Class = ns.type.Class;
-    var ID = ns.protocol.ID;
-    var Document = ns.protocol.Document;
-    var BaseDocument = ns.mkm.BaseDocument;
-    var BaseBulletin = ns.mkm.BaseBulletin;
-    var BaseVisa = ns.mkm.BaseVisa;
-    var doc_type = function (type, identifier) {
-        if (type !== '*') {
-            return type
-        } else if (identifier.isGroup()) {
-            return Document.BULLETIN
-        } else if (identifier.isUser()) {
-            return Document.VISA
-        } else {
-            return Document.PROFILE
-        }
-    };
-    var GeneralDocumentFactory = function (type) {
-        Object.call(this);
-        this.__type = type
-    };
-    Class(GeneralDocumentFactory, Object, [Document.Factory], null);
-    GeneralDocumentFactory.prototype.createDocument = function (identifier, data, signature) {
-        var type = doc_type(this.__type, identifier);
-        if (data && signature) {
-            if (type === Document.VISA) {
-                return new BaseVisa(identifier, data, signature)
-            } else if (type === Document.BULLETIN) {
-                return new BaseBulletin(identifier, data, signature)
-            } else {
-                return new BaseDocument(identifier, data, signature)
+    var GeneralCommandFactory = dkd.dkd.GeneralCommandFactory;
+    Class(GeneralCommandFactory, BaseObject, [ContentFactory, CommandFactory], null);
+    GeneralCommandFactory.prototype.parseContent = function (content) {
+        var helper = SharedCommandExtensions.getHelper();
+        var cmdHelper = SharedCommandExtensions.getCommandHelper();
+        var cmd = helper.getCmd(content, null);
+        var factory = !cmd ? null : cmdHelper.getCommandFactory(cmd);
+        if (!factory) {
+            if (content['group']) {
+                factory = cmdHelper.getCommandFactory('group')
             }
-        } else {
-            if (type === Document.VISA) {
-                return new BaseVisa(identifier)
-            } else if (type === Document.BULLETIN) {
-                return new BaseBulletin(identifier)
-            } else {
-                return new BaseDocument(identifier, type)
+            if (!factory) {
+                factory = this
             }
         }
+        return factory.parseCommand(content)
     };
-    GeneralDocumentFactory.prototype.parseDocument = function (doc) {
-        var identifier = ID.parse(doc['ID']);
-        if (!identifier) {
+    GeneralCommandFactory.prototype.parseCommand = function (content) {
+        if (!content['sn'] || !content['command']) {
             return null
         }
-        var gf = general_factory();
-        var type = gf.getDocumentType(doc, null);
-        if (!type) {
-            type = doc_type('*', identifier)
+        return new BaseCommand(content)
+    };
+    dkd.dkd.HistoryCommandFactory = function () {
+        GeneralCommandFactory.call(this)
+    };
+    var HistoryCommandFactory = dkd.dkd.HistoryCommandFactory;
+    Class(HistoryCommandFactory, GeneralCommandFactory, null, null);
+    HistoryCommandFactory.prototype.parseCommand = function (content) {
+        if (!content['sn'] || !content['command'] || !content['time']) {
+            return null
         }
-        if (type === Document.VISA) {
-            return new BaseVisa(doc)
-        } else if (type === Document.BULLETIN) {
-            return new BaseBulletin(doc)
+        return new BaseHistoryCommand(content)
+    };
+    dkd.dkd.GroupCommandFactory = function () {
+        HistoryCommandFactory.call(this)
+    };
+    var GroupCommandFactory = dkd.dkd.GroupCommandFactory;
+    Class(GroupCommandFactory, HistoryCommandFactory, null, null);
+    GroupCommandFactory.prototype.parseContent = function (content) {
+        var helper = SharedCommandExtensions.getHelper();
+        var cmdHelper = SharedCommandExtensions.getCommandHelper();
+        var cmd = helper.getCmd(content, null);
+        var factory = !cmd ? null : cmdHelper.getCommandFactory(cmd);
+        if (!factory) {
+            factory = this
+        }
+        return factory.parseCommand(content)
+    };
+    GroupCommandFactory.prototype.parseCommand = function (content) {
+        if (!content['sn'] || !content['command'] || !content['group']) {
+            return null
+        }
+        return new BaseGroupCommand(content)
+    };
+    var random_int = function (max) {
+        return Math.floor(Math.random() * max)
+    };
+    dkd.msg.MessageFactory = function () {
+        BaseObject.call(this);
+        this.__sn = random_int(0x7fffffff)
+    };
+    var MessageFactory = dkd.msg.MessageFactory;
+    Class(MessageFactory, BaseObject, [EnvelopeFactory, InstantMessageFactory, SecureMessageFactory, ReliableMessageFactory], null);
+    MessageFactory.prototype.next = function () {
+        var sn = this.__sn;
+        if (sn < 0x7fffffff) {
+            sn += 1
         } else {
-            return new BaseDocument(doc)
+            sn = 1
+        }
+        this.__sn = sn;
+        return sn
+    };
+    MessageFactory.prototype.createEnvelope = function (from, to, when) {
+        return new MessageEnvelope(from, to, when)
+    };
+    MessageFactory.prototype.parseEnvelope = function (env) {
+        if (!env['sender']) {
+            return null
+        }
+        return new MessageEnvelope(env)
+    };
+    MessageFactory.prototype.generateSerialNumber = function (msgType, now) {
+        return this.next()
+    };
+    MessageFactory.prototype.createInstantMessage = function (head, body) {
+        return new PlainMessage(head, body)
+    };
+    MessageFactory.prototype.parseInstantMessage = function (msg) {
+        if (!msg["sender"] || !msg["content"]) {
+            return null
+        }
+        return new PlainMessage(msg)
+    };
+    MessageFactory.prototype.parseSecureMessage = function (msg) {
+        if (!msg["sender"] || !msg["data"]) {
+            return null
+        }
+        if (msg['signature']) {
+            return new NetworkMessage(msg)
+        }
+        return new EncryptedMessage(msg)
+    };
+    MessageFactory.prototype.parseReliableMessage = function (msg) {
+        if (!msg['sender'] || !msg['data'] || !msg['signature']) {
+            return null
+        }
+        return new NetworkMessage(msg)
+    };
+    mk.ext.CryptoKeyGeneralFactory = function () {
+        BaseObject.call(this);
+        this.__symmetricKeyFactories = {};
+        this.__privateKeyFactories = {};
+        this.__publicKeyFactories = {}
+    };
+    var CryptoKeyGeneralFactory = mk.ext.CryptoKeyGeneralFactory;
+    Class(CryptoKeyGeneralFactory, BaseObject, [GeneralCryptoHelper, SymmetricKeyHelper, PrivateKeyHelper, PublicKeyHelper], null);
+    CryptoKeyGeneralFactory.prototype.getKeyAlgorithm = function (key, defaultValue) {
+        var algorithm = key['algorithm'];
+        return Converter.getString(algorithm, defaultValue)
+    };
+    CryptoKeyGeneralFactory.prototype.setSymmetricKeyFactory = function (algorithm, factory) {
+        this.__symmetricKeyFactories[algorithm] = factory
+    };
+    CryptoKeyGeneralFactory.prototype.getSymmetricKeyFactory = function (algorithm) {
+        return this.__symmetricKeyFactories[algorithm]
+    };
+    CryptoKeyGeneralFactory.prototype.generateSymmetricKey = function (algorithm) {
+        var factory = this.getSymmetricKeyFactory(algorithm);
+        if (!factory) {
+            throw new ReferenceError('key algorithm not supported: ' + algorithm);
+        }
+        return factory.generateSymmetricKey(algorithm)
+    };
+    CryptoKeyGeneralFactory.prototype.parseSymmetricKey = function (key) {
+        if (!key) {
+            return null
+        } else if (Interface.conforms(key, SymmetricKey)) {
+            return key
+        }
+        var info = Wrapper.fetchMap(key);
+        if (!info) {
+            return null
+        }
+        var algorithm = this.getKeyAlgorithm(info, null);
+        var factory = !algorithm ? null : this.getSymmetricKeyFactory(algorithm);
+        if (!factory) {
+            factory = this.getSymmetricKeyFactory('*');
+            if (!factory) {
+                throw new ReferenceError('default symmetric key factory not found');
+            }
+        }
+        return factory.parseSymmetricKey(info)
+    };
+    CryptoKeyGeneralFactory.prototype.setPrivateKeyFactory = function (algorithm, factory) {
+        this.__privateKeyFactories[algorithm] = factory
+    };
+    CryptoKeyGeneralFactory.prototype.getPrivateKeyFactory = function (algorithm) {
+        return this.__privateKeyFactories[algorithm]
+    };
+    CryptoKeyGeneralFactory.prototype.generatePrivateKey = function (algorithm) {
+        var factory = this.getPrivateKeyFactory(algorithm);
+        if (!factory) {
+            throw new ReferenceError('key algorithm not supported: ' + algorithm);
+        }
+        return factory.generatePrivateKey(algorithm)
+    };
+    CryptoKeyGeneralFactory.prototype.parsePrivateKey = function (key) {
+        if (!key) {
+            return null
+        } else if (Interface.conforms(key, PrivateKey)) {
+            return key
+        }
+        var info = Wrapper.fetchMap(key);
+        if (!info) {
+            return null
+        }
+        var algorithm = this.getKeyAlgorithm(info, null);
+        var factory = !algorithm ? null : this.getPrivateKeyFactory(algorithm);
+        if (!factory) {
+            factory = this.getPrivateKeyFactory('*');
+            if (!factory) {
+                throw new ReferenceError('default private key factory not found');
+            }
+        }
+        return factory.parsePrivateKey(info)
+    };
+    CryptoKeyGeneralFactory.prototype.setPublicKeyFactory = function (algorithm, factory) {
+        this.__publicKeyFactories[algorithm] = factory
+    };
+    CryptoKeyGeneralFactory.prototype.getPublicKeyFactory = function (algorithm) {
+        return this.__publicKeyFactories[algorithm]
+    };
+    CryptoKeyGeneralFactory.prototype.parsePublicKey = function (key) {
+        if (!key) {
+            return null
+        } else if (Interface.conforms(key, PublicKey)) {
+            return key
+        }
+        var info = Wrapper.fetchMap(key);
+        if (!info) {
+            return null
+        }
+        var algorithm = this.getKeyAlgorithm(info, null);
+        var factory = !algorithm ? null : this.getPublicKeyFactory(algorithm);
+        if (!factory) {
+            factory = this.getPublicKeyFactory('*');
+            if (!factory) {
+                throw new ReferenceError('default public key factory not found');
+            }
+        }
+        return factory.parsePublicKey(info)
+    };
+    mk.ext.FormatGeneralFactory = function () {
+        BaseObject.call(this);
+        this.__tedFactories = {};
+        this.__pnfFactory = null
+    };
+    var FormatGeneralFactory = mk.ext.FormatGeneralFactory;
+    Class(FormatGeneralFactory, BaseObject, [GeneralFormatHelper, PortableNetworkFileHelper, TransportableDataHelper], null);
+    FormatGeneralFactory.prototype.split = function (text) {
+        var pos1 = text.indexOf('://');
+        if (pos1 > 0) {
+            return [text]
+        } else {
+            pos1 = text.indexOf(':') + 1
+        }
+        var array = [];
+        var pos2 = text.indexOf(';', pos1);
+        if (pos2 > pos1) {
+            array.push(text.substring(pos1, pos2));
+            pos1 = pos2 + 1
+        }
+        pos2 = text.indexOf(',', pos1);
+        if (pos2 > pos1) {
+            array.unshift(text.substring(pos1, pos2));
+            pos1 = pos2 + 1
+        }
+        if (pos1 === 0) {
+            array.unshift(text)
+        } else {
+            array.unshift(text.substring(pos1))
+        }
+        return array
+    };
+    FormatGeneralFactory.prototype.decode = function (data, defaultKey) {
+        var text;
+        if (Interface.conforms(data, Mapper)) {
+            return data.toMap()
+        } else if (Interface.conforms(data, Stringer)) {
+            text = data.toString()
+        } else if (IObject.isString(data)) {
+            text = data
+        } else {
+            return data
+        }
+        if (text.length === 0) {
+            return null
+        } else if (text.charAt(0) === '{' && text.charAt(text.length - 1) === '}') {
+            return JSONMap.decode(text)
+        }
+        var info = {};
+        var array = this.split(text);
+        var size = array.length;
+        if (size === 1) {
+            info[defaultKey] = array[0]
+        } else {
+            info['data'] = array[0];
+            info['algorithm'] = array[1];
+            if (size > 2) {
+                info['content-type'] = array[2];
+                if (text.length > 5 && text.substring(0, 5) === 'data:') {
+                    info['URL'] = text
+                }
+            }
+        }
+        return info
+    };
+    FormatGeneralFactory.prototype.getFormatAlgorithm = function (ted, defaultValue) {
+        var algorithm = ted['algorithm'];
+        return Converter.getString(algorithm, defaultValue)
+    };
+    FormatGeneralFactory.prototype.setTransportableDataFactory = function (algorithm, factory) {
+        this.__tedFactories[algorithm] = factory
+    };
+    FormatGeneralFactory.prototype.getTransportableDataFactory = function (algorithm) {
+        return this.__tedFactories[algorithm]
+    };
+    FormatGeneralFactory.prototype.createTransportableData = function (data, algorithm) {
+        if (!algorithm || algorithm === '' || algorithm === '*') {
+            algorithm = EncodeAlgorithms.DEFAULT
+        }
+        var factory = this.getTransportableDataFactory(algorithm);
+        if (!factory) {
+            throw new ReferenceError('TED algorithm not support: ' + algorithm);
+        }
+        return factory.createTransportableData(data)
+    };
+    FormatGeneralFactory.prototype.parseTransportableData = function (ted) {
+        if (!ted) {
+            return null
+        } else if (Interface.conforms(ted, TransportableData)) {
+            return ted
+        }
+        var info = this.decode(ted, 'data');
+        if (!info) {
+            return null
+        }
+        var algo = this.getFormatAlgorithm(info);
+        var factory = !algo ? null : this.getTransportableDataFactory(algo);
+        if (!factory) {
+            factory = this.getTransportableDataFactory('*');
+            if (!factory) {
+                throw new ReferenceError('default TED factory not found');
+            }
+        }
+        return factory.parseTransportableData(info)
+    };
+    FormatGeneralFactory.prototype.setPortableNetworkFileFactory = function (factory) {
+        this.__pnfFactory = factory
+    };
+    FormatGeneralFactory.prototype.getPortableNetworkFileFactory = function () {
+        return this.__pnfFactory
+    };
+    FormatGeneralFactory.prototype.createPortableNetworkFile = function (data, filename, url, password) {
+        var factory = this.getPortableNetworkFileFactory();
+        if (!factory) {
+            throw new ReferenceError('PNF factory not ready');
+        }
+        return factory.createPortableNetworkFile(data, filename, url, password)
+    };
+    FormatGeneralFactory.prototype.parsePortableNetworkFile = function (pnf) {
+        if (!pnf) {
+            return null
+        } else if (Interface.conforms(pnf, PortableNetworkFile)) {
+            return pnf
+        }
+        var info = this.decode(pnf, 'URL');
+        if (!info) {
+            return null
+        }
+        var factory = this.getPortableNetworkFileFactory();
+        if (!factory) {
+            throw new ReferenceError('PNF factory not ready');
+        }
+        return factory.parsePortableNetworkFile(info)
+    };
+    mkm.ext.AccountGeneralFactory = function () {
+        BaseObject.call(this);
+        this.__addressFactory = null;
+        this.__idFactory = null;
+        this.__metaFactories = {};
+        this.__docsFactories = {}
+    };
+    var AccountGeneralFactory = mkm.ext.AccountGeneralFactory;
+    Class(AccountGeneralFactory, BaseObject, [GeneralAccountHelper, AddressHelper, IdentifierHelper, MetaHelper, DocumentHelper], null);
+    AccountGeneralFactory.prototype.getMetaType = function (meta, defaultValue) {
+        var type = meta['type'];
+        return Converter.getString(type, defaultValue)
+    };
+    AccountGeneralFactory.prototype.getDocumentType = function (doc, defaultValue) {
+        var type = doc['type'];
+        if (type) {
+            return Converter.getString(type, defaultValue)
+        } else if (defaultValue) {
+            return defaultValue
+        }
+        var did = ID.parse(doc['did']);
+        if (!did) {
+            return null
+        } else if (did.isUser()) {
+            return DocumentType.VISA
+        } else if (did.isUser()) {
+            return DocumentType.BULLETIN
+        } else {
+            return DocumentType.PROFILE
         }
     };
-    var general_factory = function () {
-        var man = ns.mkm.AccountFactoryManager;
-        return man.generalFactory
+    AccountGeneralFactory.prototype.setAddressFactory = function (factory) {
+        this.__addressFactory = factory
     };
-    ns.mkm.GeneralDocumentFactory = GeneralDocumentFactory
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var Address = ns.protocol.Address;
-    var ID = ns.protocol.ID;
-    var Meta = ns.protocol.Meta;
-    var Document = ns.protocol.Document;
-    var GeneralAddressFactory = ns.mkm.GeneralAddressFactory;
-    var GeneralIdentifierFactory = ns.mkm.GeneralIdentifierFactory;
-    var GeneralMetaFactory = ns.mkm.GeneralMetaFactory;
-    var GeneralDocumentFactory = ns.mkm.GeneralDocumentFactory;
-    var registerAddressFactory = function () {
-        Address.setFactory(new GeneralAddressFactory())
+    AccountGeneralFactory.prototype.getAddressFactory = function () {
+        return this.__addressFactory
     };
-    var registerIdentifierFactory = function () {
-        ID.setFactory(new GeneralIdentifierFactory())
+    AccountGeneralFactory.prototype.parseAddress = function (address) {
+        if (!address) {
+            return null
+        } else if (Interface.conforms(address, Address)) {
+            return address
+        }
+        var str = Wrapper.fetchString(address);
+        if (!str) {
+            return null
+        }
+        var factory = this.getAddressFactory();
+        if (!factory) {
+            throw new ReferenceError('address factory not ready');
+        }
+        return factory.parseAddress(address)
     };
-    var registerMetaFactories = function () {
-        Meta.setFactory(Meta.MKM, new GeneralMetaFactory(Meta.MKM));
-        Meta.setFactory(Meta.BTC, new GeneralMetaFactory(Meta.BTC));
-        Meta.setFactory(Meta.ETH, new GeneralMetaFactory(Meta.ETH))
+    AccountGeneralFactory.prototype.generateAddress = function (meta, network) {
+        var factory = this.getAddressFactory();
+        if (!factory) {
+            throw new ReferenceError('address factory not ready');
+        }
+        return factory.generateAddress(meta, network)
     };
-    var registerDocumentFactories = function () {
-        Document.setFactory('*', new GeneralDocumentFactory('*'));
-        Document.setFactory(Document.VISA, new GeneralDocumentFactory(Document.VISA));
-        Document.setFactory(Document.PROFILE, new GeneralDocumentFactory(Document.PROFILE));
-        Document.setFactory(Document.BULLETIN, new GeneralDocumentFactory(Document.BULLETIN))
+    AccountGeneralFactory.prototype.setIdentifierFactory = function (factory) {
+        this.__idFactory = factory
     };
-    ns.registerAddressFactory = registerAddressFactory;
-    ns.registerIdentifierFactory = registerIdentifierFactory;
-    ns.registerMetaFactories = registerMetaFactories;
-    ns.registerDocumentFactories = registerDocumentFactories
-})(DIMP);
-(function (ns) {
-    'use strict';
-    var SymmetricKey = ns.crypto.SymmetricKey;
-    var AsymmetricKey = ns.crypto.AsymmetricKey;
-    var PrivateKey = ns.crypto.PrivateKey;
-    var PublicKey = ns.crypto.PublicKey;
-    var PlainKey = ns.crypto.PlainKey;
-    var ECCPrivateKeyFactory = ns.crypto.ECCPrivateKeyFactory;
-    var ECCPublicKeyFactory = ns.crypto.ECCPublicKeyFactory
-    var RSAPrivateKeyFactory = ns.crypto.RSAPrivateKeyFactory;
-    var RSAPublicKeyFactory = ns.crypto.RSAPublicKeyFactory
-    var AESKeyFactory = ns.crypto.AESKeyFactory;
-    var PlainKeyFactory = ns.crypto.PlainKeyFactory;
-    var registerKeyFactories = function () {
-        var ecc_pri = new ECCPrivateKeyFactory();
-        PrivateKey.setFactory(AsymmetricKey.ECC, ecc_pri);
-        PrivateKey.setFactory('SHA256withECC', ecc_pri);
-        var ecc_pub = new ECCPublicKeyFactory();
-        PublicKey.setFactory(AsymmetricKey.ECC, ecc_pub);
-        PublicKey.setFactory('SHA256withECC', ecc_pub);
-        var rsa_pri = new RSAPrivateKeyFactory();
-        PrivateKey.setFactory(AsymmetricKey.RSA, rsa_pri);
-        PrivateKey.setFactory('SHA256withRSA', rsa_pri);
-        PrivateKey.setFactory('RSA/ECB/PKCS1Padding', rsa_pri);
-        var rsa_pub = new RSAPublicKeyFactory();
-        PublicKey.setFactory(AsymmetricKey.RSA, rsa_pub);
-        PublicKey.setFactory('SHA256withRSA', rsa_pub);
-        PublicKey.setFactory('RSA/ECB/PKCS1Padding', rsa_pub);
-        var aes = new AESKeyFactory();
-        SymmetricKey.setFactory(SymmetricKey.AES, aes);
-        SymmetricKey.setFactory('AES/CBC/PKCS7Padding', aes);
-        SymmetricKey.setFactory(PlainKey.PLAIN, new PlainKeyFactory())
+    AccountGeneralFactory.prototype.getIdentifierFactory = function () {
+        return this.__idFactory
     };
-    var registerPlugins = function () {
-        ns.registerKeyFactories();
-        ns.registerIdentifierFactory();
-        ns.registerAddressFactory();
-        ns.registerMetaFactories();
-        ns.registerDocumentFactories()
+    AccountGeneralFactory.prototype.parseIdentifier = function (identifier) {
+        if (!identifier) {
+            return null
+        } else if (Interface.conforms(identifier, ID)) {
+            return identifier
+        }
+        var str = Wrapper.fetchString(identifier);
+        if (!str) {
+            return null
+        }
+        var factory = this.getIdentifierFactory();
+        if (!factory) {
+            throw new ReferenceError('ID factory not ready');
+        }
+        return factory.parseIdentifier(identifier)
     };
-    ns.registerKeyFactories = registerKeyFactories;
-    ns.registerPlugins = registerPlugins
-})(DIMP);
+    AccountGeneralFactory.prototype.createIdentifier = function (name, address, terminal) {
+        var factory = this.getIdentifierFactory();
+        if (!factory) {
+            throw new ReferenceError('ID factory not ready');
+        }
+        return factory.createIdentifier(name, address, terminal)
+    };
+    AccountGeneralFactory.prototype.generateIdentifier = function (meta, network, terminal) {
+        var factory = this.getIdentifierFactory();
+        if (!factory) {
+            throw new ReferenceError('ID factory not ready');
+        }
+        return factory.createIdentifier(meta, network, terminal)
+    };
+    AccountGeneralFactory.prototype.setMetaFactory = function (type, factory) {
+        this.__metaFactories[type] = factory
+    };
+    AccountGeneralFactory.prototype.getMetaFactory = function (type) {
+        return this.__metaFactories[type]
+    };
+    AccountGeneralFactory.prototype.createMeta = function (type, pKey, seed, fingerprint) {
+        var factory = this.getMetaFactory(type);
+        if (!factory) {
+            throw new ReferenceError('meta type not supported: ' + type);
+        }
+        return factory.createMeta(pKey, seed, fingerprint)
+    };
+    AccountGeneralFactory.prototype.generateMeta = function (type, sKey, seed) {
+        var factory = this.getMetaFactory(type);
+        if (!factory) {
+            throw new ReferenceError('meta type not supported: ' + type);
+        }
+        return factory.generateMeta(sKey, seed)
+    };
+    AccountGeneralFactory.prototype.parseMeta = function (meta) {
+        if (!meta) {
+            return null
+        } else if (Interface.conforms(meta, Meta)) {
+            return meta
+        }
+        var info = Wrapper.fetchMap(meta);
+        if (!info) {
+            return null
+        }
+        var type = this.getMetaType(info, null);
+        var factory = !type ? null : this.getMetaFactory(type);
+        if (!factory) {
+            factory = this.getMetaFactory('*');
+            if (!factory) {
+                throw new ReferenceError('default meta factory not found');
+            }
+        }
+        return factory.parseMeta(info)
+    };
+    AccountGeneralFactory.prototype.setDocumentFactory = function (type, factory) {
+        this.__docsFactories[type] = factory
+    };
+    AccountGeneralFactory.prototype.getDocumentFactory = function (type) {
+        return this.__docsFactories[type]
+    };
+    AccountGeneralFactory.prototype.createDocument = function (type, identifier, data, signature) {
+        var factory = this.getDocumentFactory(type);
+        if (!factory) {
+            throw new ReferenceError('document type not supported: ' + type);
+        }
+        return factory.createDocument(identifier, data, signature)
+    };
+    AccountGeneralFactory.prototype.parseDocument = function (doc) {
+        if (!doc) {
+            return null
+        } else if (Interface.conforms(doc, Document)) {
+            return doc
+        }
+        var info = Wrapper.fetchMap(doc);
+        if (!info) {
+            return null
+        }
+        var type = this.getDocumentType(info, null);
+        var factory = !type ? null : this.getDocumentFactory(type);
+        if (!factory) {
+            factory = this.getDocumentFactory('*');
+            if (!factory) {
+                throw new ReferenceError('default document factory not found');
+            }
+        }
+        return factory.parseDocument(info)
+    };
+    dkd.ext.MessageGeneralFactory = function () {
+        BaseObject.call(this);
+        this.__contentFactories = {};
+        this.__envelopeFactory = null;
+        this.__instantMessageFactory = null;
+        this.__secureMessageFactory = null;
+        this.__reliableMessageFactory = null
+    };
+    var MessageGeneralFactory = dkd.ext.MessageGeneralFactory
+    Class(MessageGeneralFactory, BaseObject, [GeneralMessageHelper, ContentHelper, EnvelopeHelper, InstantMessageHelper, SecureMessageHelper, ReliableMessageHelper], null);
+    MessageGeneralFactory.prototype.getContentType = function (content, defaultValue) {
+        var type = content['type'];
+        return Converter.getString(type, defaultValue)
+    };
+    MessageGeneralFactory.prototype.setContentFactory = function (type, factory) {
+        this.__contentFactories[type] = factory
+    };
+    MessageGeneralFactory.prototype.getContentFactory = function (type) {
+        return this.__contentFactories[type]
+    };
+    MessageGeneralFactory.prototype.parseContent = function (content) {
+        if (!content) {
+            return null
+        } else if (Interface.conforms(content, Content)) {
+            return content
+        }
+        var info = Wrapper.fetchMap(content);
+        if (!info) {
+            return null
+        }
+        var type = this.getContentType(info, null);
+        var factory = !type ? null : this.getContentFactory(type);
+        if (!factory) {
+            factory = this.getContentFactory('*');
+            if (!factory) {
+                throw new ReferenceError('default content factory not found');
+            }
+        }
+        return factory.parseContent(info)
+    };
+    MessageGeneralFactory.prototype.setEnvelopeFactory = function (factory) {
+        this.__envelopeFactory = factory
+    };
+    MessageGeneralFactory.prototype.getEnvelopeFactory = function () {
+        return this.__envelopeFactory
+    };
+    MessageGeneralFactory.prototype.createEnvelope = function (sender, receiver, time) {
+        var factory = this.getEnvelopeFactory();
+        if (!factory) {
+            throw new ReferenceError('envelope factory not ready');
+        }
+        return factory.createEnvelope(sender, receiver, time)
+    };
+    MessageGeneralFactory.prototype.parseEnvelope = function (env) {
+        if (!env) {
+            return null
+        } else if (Interface.conforms(env, Envelope)) {
+            return env
+        }
+        var info = Wrapper.fetchMap(env);
+        if (!info) {
+            return null
+        }
+        var factory = this.getEnvelopeFactory();
+        if (!factory) {
+            throw new ReferenceError('envelope factory not ready');
+        }
+        return factory.parseEnvelope(info)
+    };
+    MessageGeneralFactory.prototype.setInstantMessageFactory = function (factory) {
+        this.__instantMessageFactory = factory
+    };
+    MessageGeneralFactory.prototype.getInstantMessageFactory = function () {
+        return this.__instantMessageFactory
+    };
+    MessageGeneralFactory.prototype.createInstantMessage = function (head, body) {
+        var factory = this.getInstantMessageFactory();
+        if (!factory) {
+            throw new ReferenceError('instant message factory not ready');
+        }
+        return factory.createInstantMessage(head, body)
+    };
+    MessageGeneralFactory.prototype.parseInstantMessage = function (msg) {
+        if (!msg) {
+            return null
+        } else if (Interface.conforms(msg, InstantMessage)) {
+            return msg
+        }
+        var info = Wrapper.fetchMap(msg);
+        if (!info) {
+            return null
+        }
+        var factory = this.getInstantMessageFactory();
+        if (!factory) {
+            throw new ReferenceError('instant message factory not ready');
+        }
+        return factory.parseInstantMessage(info)
+    };
+    MessageGeneralFactory.prototype.generateSerialNumber = function (type, when) {
+        var factory = this.getInstantMessageFactory();
+        if (!factory) {
+            throw new ReferenceError('instant message factory not ready');
+        }
+        return factory.generateSerialNumber(type, when)
+    };
+    MessageGeneralFactory.prototype.setSecureMessageFactory = function (factory) {
+        this.__secureMessageFactory = factory
+    };
+    MessageGeneralFactory.prototype.getSecureMessageFactory = function () {
+        return this.__secureMessageFactory
+    };
+    MessageGeneralFactory.prototype.parseSecureMessage = function (msg) {
+        if (!msg) {
+            return null
+        } else if (Interface.conforms(msg, SecureMessage)) {
+            return msg
+        }
+        var info = Wrapper.fetchMap(msg);
+        if (!info) {
+            return null
+        }
+        var factory = this.getSecureMessageFactory();
+        if (!factory) {
+            throw new ReferenceError('secure message factory not ready');
+        }
+        return factory.parseSecureMessage(info)
+    };
+    MessageGeneralFactory.prototype.setReliableMessageFactory = function (factory) {
+        this.__reliableMessageFactory = factory
+    };
+    MessageGeneralFactory.prototype.getReliableMessageFactory = function () {
+        return this.__reliableMessageFactory
+    };
+    MessageGeneralFactory.prototype.parseReliableMessage = function (msg) {
+        if (!msg) {
+            return null
+        } else if (Interface.conforms(msg, ReliableMessage)) {
+            return msg
+        }
+        var info = Wrapper.fetchMap(msg);
+        if (!info) {
+            return null
+        }
+        var factory = this.getReliableMessageFactory();
+        if (!factory) {
+            throw new ReferenceError('reliable message factory not ready');
+        }
+        return factory.parseReliableMessage(info)
+    };
+    dkd.ext.CommandGeneralFactory = function () {
+        BaseObject.call(this);
+        this.__commandFactories = {}
+    };
+    var CommandGeneralFactory = dkd.ext.CommandGeneralFactory
+    Class(CommandGeneralFactory, BaseObject, [GeneralCommandHelper, CommandHelper], null);
+    CommandGeneralFactory.prototype.getCmd = function (content, defaultValue) {
+        var cmd = content['command'];
+        return Converter.getString(cmd, defaultValue)
+    };
+    CommandGeneralFactory.prototype.setCommandFactory = function (cmd, factory) {
+        this.__commandFactories[cmd] = factory
+    };
+    CommandGeneralFactory.prototype.getCommandFactory = function (cmd) {
+        return this.__commandFactories[cmd]
+    };
+    CommandGeneralFactory.prototype.parseCommand = function (content) {
+        if (!content) {
+            return null
+        } else if (Interface.conforms(content, Command)) {
+            return content
+        }
+        var info = Wrapper.fetchMap(content);
+        if (!info) {
+            return null
+        }
+        var cmd = this.getCmd(info, null);
+        var factory = !cmd ? null : this.getCommandFactory(cmd);
+        if (!factory) {
+            factory = default_command_factory(info);
+            if (!factory) {
+                throw new ReferenceError('default document factory not found');
+            }
+        }
+        return factory.parseCommand(info)
+    };
+    var default_command_factory = function (info) {
+        var helper = SharedMessageExtensions.getHelper();
+        var contentHelper = SharedMessageExtensions.getContentHelper();
+        var type = helper.getContentType(info);
+        if (!type) {
+            return null
+        }
+        var factory = contentHelper.getContentFactory(type);
+        if (!factory) {
+            return null
+        } else if (Interface.conforms(factory, CommandFactory)) {
+            return factory
+        } else {
+            return null
+        }
+    };
+    dimp.ext.ExtensionLoader = function () {
+        BaseObject.call(this)
+    };
+    var ExtensionLoader = dimp.ext.ExtensionLoader;
+    Class(ExtensionLoader, BaseObject, null, {
+        load: function () {
+            this.registerCoreHelpers();
+            this.registerMessageFactories();
+            this.registerContentFactories();
+            this.registerCommandFactories()
+        }, registerCoreHelpers: function () {
+            this.registerCryptoHelpers();
+            this.registerFormatHelpers();
+            this.registerAccountHelpers();
+            this.registerMessageHelpers();
+            this.registerCommandHelpers()
+        }, registerCryptoHelpers: function () {
+            var helper = new CryptoKeyGeneralFactory();
+            var ext = SharedCryptoExtensions;
+            ext.setSymmetricHelper(helper);
+            ext.setPrivateHelper(helper);
+            ext.setPublicHelper(helper);
+            ext.setHelper(helper)
+        }, registerFormatHelpers: function () {
+            var helper = new FormatGeneralFactory();
+            var ext = SharedFormatExtensions;
+            ext.setPNFHelper(helper);
+            ext.setTEDHelper(helper);
+            ext.setHelper(helper)
+        }, registerAccountHelpers: function () {
+            var helper = new AccountGeneralFactory();
+            var ext = SharedAccountExtensions;
+            ext.setAddressHelper(helper);
+            ext.setIdentifierHelper(helper);
+            ext.setMetaHelper(helper);
+            ext.setDocumentHelper(helper);
+            ext.setHelper(helper)
+        }, registerMessageHelpers: function () {
+            var helper = new MessageGeneralFactory();
+            var ext = SharedMessageExtensions;
+            ext.setContentHelper(helper);
+            ext.setEnvelopeHelper(helper);
+            ext.setInstantHelper(helper);
+            ext.setSecureHelper(helper);
+            ext.setReliableHelper(helper);
+            ext.setHelper(helper)
+        }, registerCommandHelpers: function () {
+            var helper = new CommandGeneralFactory();
+            var ext = SharedCommandExtensions;
+            ext.setCommandHelper(helper);
+            ext.setHelper(helper)
+        }, registerMessageFactories: function () {
+            var factory = new MessageFactory();
+            Envelope.setFactory(factory);
+            InstantMessage.setFactory(factory);
+            SecureMessage.setFactory(factory);
+            ReliableMessage.setFactory(factory)
+        }, registerContentFactories: function () {
+            this.setContentFactory(ContentType.TEXT, 'text', null, BaseTextContent);
+            this.setContentFactory(ContentType.FILE, 'file', null, BaseFileContent);
+            this.setContentFactory(ContentType.IMAGE, 'image', null, ImageFileContent);
+            this.setContentFactory(ContentType.AUDIO, 'audio', null, AudioFileContent);
+            this.setContentFactory(ContentType.VIDEO, 'video', null, VideoFileContent);
+            this.setContentFactory(ContentType.PAGE, 'page', null, WebPageContent);
+            this.setContentFactory(ContentType.NAME_CARD, 'card', null, NameCardContent);
+            this.setContentFactory(ContentType.QUOTE, 'quote', null, BaseQuoteContent);
+            this.setContentFactory(ContentType.MONEY, 'money', null, BaseMoneyContent);
+            this.setContentFactory(ContentType.TRANSFER, 'transfer', null, TransferMoneyContent);
+            this.setContentFactory(ContentType.COMMAND, 'command', new GeneralCommandFactory(), null);
+            this.setContentFactory(ContentType.HISTORY, 'history', new HistoryCommandFactory(), null);
+            this.setContentFactory(ContentType.ARRAY, 'array', null, ListContent);
+            this.setContentFactory(ContentType.COMBINE_FORWARD, 'combine', null, CombineForwardContent);
+            this.setContentFactory(ContentType.FORWARD, 'forward', null, SecretContent);
+            this.setContentFactory(ContentType.ANY, '*', null, BaseContent);
+            this.registerCustomizedFactories()
+        }, registerCustomizedFactories: function () {
+            this.setContentFactory(ContentType.CUSTOMIZED, 'customized', null, AppCustomizedContent)
+        }, setContentFactory: function (type, alias, factory, clazz) {
+            if (factory) {
+                Content.setFactory(type, factory);
+                Content.setFactory(alias, factory)
+            }
+            if (clazz) {
+                factory = new ContentParser(clazz);
+                Content.setFactory(type, factory);
+                Content.setFactory(alias, factory)
+            }
+        }, setCommandFactory: function (cmd, factory, clazz) {
+            if (factory) {
+                Command.setFactory(cmd, factory)
+            }
+            if (clazz) {
+                factory = new CommandParser(clazz);
+                Command.setFactory(cmd, factory)
+            }
+        }, registerCommandFactories: function () {
+            this.setCommandFactory(Command.META, null, BaseMetaCommand);
+            this.setCommandFactory(Command.DOCUMENTS, null, BaseDocumentCommand);
+            this.setCommandFactory(Command.RECEIPT, null, BaseReceiptCommand);
+            this.setCommandFactory('group', new GroupCommandFactory(), null);
+            this.setCommandFactory(GroupCommand.INVITE, null, InviteGroupCommand);
+            this.setCommandFactory(GroupCommand.EXPEL, null, ExpelGroupCommand);
+            this.setCommandFactory(GroupCommand.JOIN, null, JoinGroupCommand);
+            this.setCommandFactory(GroupCommand.QUIT, null, QuitGroupCommand);
+            this.setCommandFactory(GroupCommand.RESET, null, ResetGroupCommand);
+            this.setCommandFactory(GroupCommand.HIRE, null, HireGroupCommand);
+            this.setCommandFactory(GroupCommand.FIRE, null, FireGroupCommand);
+            this.setCommandFactory(GroupCommand.RESIGN, null, ResignGroupCommand)
+        }
+    });
+    dkd.dkd.ContentParser = function (clazz) {
+        BaseObject.call(this);
+        this.__class = clazz
+    };
+    var ContentParser = dkd.dkd.ContentParser;
+    Class(ContentParser, BaseObject, [ContentFactory], null);
+    ContentParser.prototype.parseContent = function (content) {
+        return new this.__class(content)
+    };
+    dkd.dkd.CommandParser = function (clazz) {
+        BaseObject.call(this);
+        this.__class = clazz
+    };
+    var CommandParser = dkd.dkd.CommandParser;
+    Class(CommandParser, BaseObject, [CommandFactory], null);
+    CommandParser.prototype.parseCommand = function (content) {
+        return new this.__class(content)
+    };
+    dimp.ext.PluginLoader = function () {
+        BaseObject.call(this)
+    };
+    var PluginLoader = dimp.ext.PluginLoader;
+    Class(PluginLoader, BaseObject, null, {
+        load: function () {
+            this.registerDataCoders();
+            this.registerDataDigesters();
+            this.registerSymmetricKeyFactories();
+            this.registerAsymmetricKeyFactories();
+            this.registerEntityFactories()
+        }, registerDataCoders: function () {
+            this.registerBase58Coder();
+            this.registerBase64Coder();
+            this.registerHexCoder();
+            this.registerUTF8Coder();
+            this.registerJSONCoder();
+            this.registerPNFFactory();
+            this.registerTEDFactory()
+        }, registerBase58Coder: function () {
+            Base58.setCoder(new Base58Coder())
+        }, registerBase64Coder: function () {
+            Base64.setCoder(new Base64Coder())
+        }, registerHexCoder: function () {
+            Hex.setCoder(new HexCoder())
+        }, registerUTF8Coder: function () {
+            UTF8.setCoder(new UTF8Coder())
+        }, registerJSONCoder: function () {
+            var coder = new JSONCoder();
+            JSONMap.setCoder(coder);
+            JSONList.setCoder(coder)
+        }, registerPNFFactory: function () {
+            PortableNetworkFile.setFactory(new BaseNetworkFileFactory())
+        }, registerTEDFactory: function () {
+            var tedFactory = new Base64DataFactory();
+            TransportableData.setFactory(EncodeAlgorithms.BASE_64, tedFactory);
+            TransportableData.setFactory('*', tedFactory)
+        }, registerDataDigesters: function () {
+            this.registerMD5Digester();
+            this.registerSHA1Digester();
+            this.registerSHA256Digester();
+            this.registerKeccak256Digester();
+            this.registerRIPEMD160Digester()
+        }, registerMD5Digester: function () {
+            MD5.setDigester(new MD5Digester())
+        }, registerSHA1Digester: function () {
+        }, registerSHA256Digester: function () {
+            SHA256.setDigester(new SHA256Digester())
+        }, registerKeccak256Digester: function () {
+            Keccak256.setDigester(new Keccak256Digester())
+        }, registerRIPEMD160Digester: function () {
+            RIPEMD160.setDigester(new RIPEMD160Digester())
+        }, registerSymmetricKeyFactories: function () {
+            this.registerAESKeyFactory();
+            this.registerPlainKeyFactory()
+        }, registerAESKeyFactory: function () {
+            var aes = new AESKeyFactory();
+            SymmetricKey.setFactory(SymmetricAlgorithms.AES, aes);
+            SymmetricKey.setFactory(AESKey.AES_CBC_PKCS7, aes)
+        }, registerPlainKeyFactory: function () {
+            var fact = new PlainKeyFactory();
+            SymmetricKey.setFactory(SymmetricAlgorithms.PLAIN, fact)
+        }, registerAsymmetricKeyFactories: function () {
+            this.registerRSAKeyFactories();
+            this.registerECCKeyFactories()
+        }, registerRSAKeyFactories: function () {
+            var rsaPub = new RSAPublicKeyFactory();
+            PublicKey.setFactory(AsymmetricAlgorithms.RSA, rsaPub);
+            PublicKey.setFactory('SHA256withRSA', rsaPub);
+            PublicKey.setFactory('RSA/ECB/PKCS1Padding', rsaPub);
+            var rsaPri = new RSAPrivateKeyFactory();
+            PrivateKey.setFactory(AsymmetricAlgorithms.RSA, rsaPri);
+            PrivateKey.setFactory('SHA256withRSA', rsaPri);
+            PrivateKey.setFactory('RSA/ECB/PKCS1Padding', rsaPri)
+        }, registerECCKeyFactories: function () {
+            var eccPub = new ECCPublicKeyFactory();
+            PublicKey.setFactory(AsymmetricAlgorithms.ECC, eccPub);
+            PublicKey.setFactory('SHA256withECDSA', eccPub);
+            var eccPri = new ECCPrivateKeyFactory();
+            PrivateKey.setFactory(AsymmetricAlgorithms.ECC, eccPri);
+            PrivateKey.setFactory('SHA256withECDSA', eccPri)
+        }, registerEntityFactories: function () {
+            this.registerIDFactory();
+            this.registerAddressFactory();
+            this.registerMetaFactories();
+            this.registerDocumentFactories()
+        }, registerIDFactory: function () {
+            ID.setFactory(new IdentifierFactory())
+        }, registerAddressFactory: function () {
+            Address.setFactory(new BaseAddressFactory())
+        }, registerMetaFactories: function () {
+            this.setMetaFactory(MetaType.MKM, 'mkm', null);
+            this.setMetaFactory(MetaType.BTC, 'btc', null);
+            this.setMetaFactory(MetaType.ETH, 'eth', null)
+        }, setMetaFactory: function (type, alias, factory) {
+            if (!factory) {
+                factory = new BaseMetaFactory(type)
+            }
+            Meta.setFactory(type, factory);
+            Meta.setFactory(alias, factory)
+        }, registerDocumentFactories: function () {
+            this.setDocumentFactory('*', null);
+            this.setDocumentFactory(DocumentType.VISA, null);
+            this.setDocumentFactory(DocumentType.PROFILE, null);
+            this.setDocumentFactory(DocumentType.BULLETIN, null)
+        }, setDocumentFactory: function (type, factory) {
+            if (!factory) {
+                factory = new GeneralDocumentFactory(type)
+            }
+            Document.setFactory(type, factory)
+        }
+    })
+})(DIMP, DIMP, DIMP, DIMP);

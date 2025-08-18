@@ -5,6 +5,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DIM Plugins Test Cases</title>
+    <link href="../../Crypto/tests/test.css" type="text/css" rel="stylesheet" />
+    <script src="../../Crypto/libs/loader.js"></script>
+    <script src="../../Crypto/libs/runner.js"></script>
+    <script src="../../Crypto/libs/utils.js"></script>
+
+    <script src="../../DIMP/dist/dimp.js"></script>
+
     <script src="../libs/3rd/crypto-js/core.js"></script>
     <script src="../libs/3rd/crypto-js/cipher-core.js"></script>
     <script src="../libs/3rd/crypto-js/aes.js"></script>
@@ -16,55 +23,28 @@
     <script src="../libs/3rd/ecc/bn.js"></script>
     <script src="../libs/3rd/ecc/secp256k1.js"></script>
 
-    <link href="/Crypto/tests/test.css" type="text/css" rel="stylesheet" />
-    <script src="/Crypto/libs/loader.js"></script>
-    <script src="/Crypto/libs/runner.js"></script>
-    <script src="/Crypto/libs/utils.js"></script>
-
-    <script src="/DIMP/dist/dimp.js"></script>
-
+    <script src="../src/sources.js"></script>
     <script>
         !function (ns) {
             var sources = [
-                'src/format/base58.js',
-                'src/format/base64.js',
-                'src/format/hex.js',
-                'src/format/utf8.js',
-                'src/format/json.js',
-                'src/format/ted.js',
-                'src/format/pnf.js',
-
-                'src/digest/md5.js',
-                'src/digest/sha256.js',
-                'src/digest/ripemd160.js',
-                'src/digest/keccak256.js',
-
-                'src/crypto/pem.js',
-                'src/crypto/rsa.js',
-                'src/crypto/ecc.js',
-                'src/crypto/aes.js',
-                'src/crypto/pwd.js',
-                'src/crypto/factories.js',
-
-                'src/mkm/btc.js',
-                'src/mkm/eth.js',
-                'src/mkm/address.js',
-                'src/mkm/identifier.js',
-                'src/mkm/meta.js',
-                'src/mkm/document.js',
-
-                'src/register.js',
-
-                null
-            ];
-
+                'src/requires.js'
+            ].concat(plugins_sources);
             var dist = 'dist/plugins.js';
 
             var tests = [
-                '../Crypto/tests/crypto_tests.js',
-                '../MingKeMing/tests/mkm_tests.js',
-                '../DaoKeDao/tests/dkd_tests.js',
-                '../DIMP/tests/core_tests.js',
+                '../../Crypto/tests/format/utf8.js',
+                '../../Crypto/tests/format/json.js',
+                '../../Crypto/tests/format/hex.js',
+                '../../Crypto/tests/format/base58.js',
+                '../../Crypto/tests/format/base64.js',
+                '../../Crypto/tests/crypto_tests.js',
+
+                '../../MingKeMing/tests/mkm_tests.js',
+
+                '../../DaoKeDao/tests/dkd_tests.js',
+
+                '../../DIMP/tests/core_tests.js',
+
                 'tests/compat.js',
                 'tests/plugins_tests.js',
                 null
@@ -73,6 +53,7 @@
             var base = window.location.href;
             base = base.substring(0, base.indexOf('tests/test.html'));
             var loader = new Loader(base);
+            loader.importJS('src/namespace.js');
 
             for (var i = 0; i < sources.length; ++i) {
                 loader.importJS(sources[i]);
@@ -137,16 +118,19 @@
 <p class="console">
     <script>
         !(function () {
-            var text = 'cat';
-            var file;
+            var targets = [
+                'src/ns_begin.closure'
+            ];
             for (var i = 0; i < sources.length; ++i) {
-                file = sources[i];
-                if (!file) {
-                    continue;
+                var file = sources[i];
+                if (file) {
+                    targets.push(file);
                 }
-                text += ' ' + file;
             }
-            text += ' >> ' + dist;
+            targets.push('src/ns_end.closure');
+
+            var text = targets.join(' ');
+            text = 'cat ' + text + ' > ' + dist;
             document.writeln(text);
         }());
     </script>

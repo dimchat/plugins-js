@@ -1,4 +1,4 @@
-;
+'use strict';
 // license: https://mit-license.org
 //
 //  MONKEY: Memory Object aNd KEYs
@@ -31,7 +31,8 @@
 //
 
 //! require 'json2.js' (https://github.com/douglascrockford/JSON-js)
-//! require 'coder.js'
+
+//! require <crypto.js>
 
     mk.format.JSONCoder = function () {
         BaseObject.call(this);

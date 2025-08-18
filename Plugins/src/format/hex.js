@@ -1,4 +1,4 @@
-;
+'use strict';
 // license: https://mit-license.org
 //
 //  MONKEY: Memory Object aNd KEYs
@@ -30,7 +30,7 @@
 // =============================================================================
 //
 
-//! require 'coder.js'
+//! require <crypto.js>
 
     //-------- HEX algorithm begin --------
     var hex_chars = '0123456789abcdef';

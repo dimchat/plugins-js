@@ -36,10 +36,10 @@
      *  Core Extensions Loader
      *  ~~~~~~~~~~~~~~~~~~~~~~
      */
-    dim.ext.ExtensionLoader = function () {
+    dimp.ext.ExtensionLoader = function () {
         BaseObject.call(this);
     };
-    var ExtensionLoader = dim.ext.ExtensionLoader;
+    var ExtensionLoader = dimp.ext.ExtensionLoader;
 
     Class(ExtensionLoader, BaseObject, null, {
 
