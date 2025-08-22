@@ -38,7 +38,7 @@
     };
     var RIPEMD160Digester = mk.digest.RIPEMD160Digester;
 
-    Class(RIPEMD160Digester, BaseObject, [DataDigester], {
+    Class(RIPEMD160Digester, BaseObject, [MessageDigester], {
 
         // Override
         digest: function (data) {

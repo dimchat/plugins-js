@@ -93,7 +93,7 @@
     };
     var Base64DataFactory = mk.format.Base64DataFactory;
 
-    Class(Base64DataFactory, BaseObject, [TransportableData.Factory], {
+    Class(Base64DataFactory, BaseObject, [TransportableDataFactory], {
         
         // Override
         createTransportableData: function (data) {

@@ -169,7 +169,7 @@
     };
     var BaseNetworkFileFactory = mk.format.BaseNetworkFileFactory;
 
-    Class(BaseNetworkFileFactory, BaseObject, [PortableNetworkFile.Factory], {
+    Class(BaseNetworkFileFactory, BaseObject, [PortableNetworkFileFactory], {
 
         // Override
         createPortableNetworkFile: function (ted, filename, url, password) {

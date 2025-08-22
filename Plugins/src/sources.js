@@ -15,7 +15,6 @@ var plugins_sources = [
     //
     //  Digest
     //
-    'src/digest/md5.js',
     'src/digest/sha256.js',
     'src/digest/ripemd160.js',
     'src/digest/keccak256.js',

@@ -3,7 +3,7 @@
  *  (DIMP: Decentralized Instant Messaging Protocol)
  *
  * @author    moKy <albert.moky at gmail.com>
- * @date      Aug. 19, 2025
+ * @date      Aug. 21, 2025
  * @copyright (c) 2020-2025 Albert Moky
  * @license   {@link https://mit-license.org | MIT License}
  */;
@@ -26,22 +26,21 @@
     var UTF8 = mk.format.UTF8;
     var ObjectCoder = mk.format.ObjectCoder;
     var JSONMap = mk.format.JSONMap;
-    var JSONList = mk.format.JSONList;
     var DataCoder = mk.format.DataCoder;
     var Base58 = mk.format.Base58;
     var Base64 = mk.format.Base64;
     var Hex = mk.format.Hex;
     var BaseDataWrapper = mk.format.BaseDataWrapper;
     var BaseFileWrapper = mk.format.BaseFileWrapper;
-    var DataDigester = mk.digest.DataDigester;
-    var MD5 = mk.digest.MD5;
-    var SHA1 = mk.digest.SHA1;
+    var MessageDigester = mk.digest.MessageDigester;
     var SHA256 = mk.digest.SHA256;
     var RIPEMD160 = mk.digest.RIPEMD160;
-    var Keccak256 = mk.digest.Keccak256;
+    var KECCAK256 = mk.digest.KECCAK256;
     var EncodeAlgorithms = mk.protocol.EncodeAlgorithms;
     var TransportableData = mk.protocol.TransportableData;
+    var TransportableDataFactory = mk.protocol.TransportableData.Factory;
     var PortableNetworkFile = mk.protocol.PortableNetworkFile;
+    var PortableNetworkFileFactory = mk.protocol.PortableNetworkFile.Factory;
     var SymmetricAlgorithms = mk.protocol.SymmetricAlgorithms;
     var AsymmetricAlgorithms = mk.protocol.AsymmetricAlgorithms;
     var EncryptKey = mk.protocol.EncryptKey;
@@ -512,7 +511,7 @@
         BaseObject.call(this)
     };
     var BaseNetworkFileFactory = mk.format.BaseNetworkFileFactory;
-    Class(BaseNetworkFileFactory, BaseObject, [PortableNetworkFile.Factory], {
+    Class(BaseNetworkFileFactory, BaseObject, [PortableNetworkFileFactory], {
         createPortableNetworkFile: function (ted, filename, url, password) {
             return new BaseNetworkFile(ted, filename, url, password)
         }, parsePortableNetworkFile: function (pnf) {
@@ -557,7 +556,7 @@
         BaseObject.call(this)
     };
     var Base64DataFactory = mk.format.Base64DataFactory;
-    Class(Base64DataFactory, BaseObject, [TransportableData.Factory], {
+    Class(Base64DataFactory, BaseObject, [TransportableDataFactory], {
         createTransportableData: function (data) {
             return new Base64Data(data)
         }, parseTransportableData: function (ted) {
@@ -643,23 +642,11 @@
             return utf8_decode(data)
         }
     })
-    mk.digest.MD5Digester = function () {
-        BaseObject.call(this)
-    };
-    var MD5Digester = mk.digest.MD5Digester;
-    Class(MD5Digester, BaseObject, [DataDigester], {
-        digest: function (data) {
-            var hex = Hex.encode(data);
-            var array = CryptoJS.enc.Hex.parse(hex);
-            var result = CryptoJS.MD5(array);
-            return Hex.decode(result.toString())
-        }
-    });
     mk.digest.SHA256Digester = function () {
         BaseObject.call(this)
     };
     var SHA256Digester = mk.digest.SHA256Digester;
-    Class(SHA256Digester, BaseObject, [DataDigester], {
+    Class(SHA256Digester, BaseObject, [MessageDigester], {
         digest: function (data) {
             var hex = Hex.encode(data);
             var array = CryptoJS.enc.Hex.parse(hex);
@@ -671,7 +658,7 @@
         BaseObject.call(this)
     };
     var RIPEMD160Digester = mk.digest.RIPEMD160Digester;
-    Class(RIPEMD160Digester, BaseObject, [DataDigester], {
+    Class(RIPEMD160Digester, BaseObject, [MessageDigester], {
         digest: function (data) {
             var hex = Hex.encode(data);
             var array = CryptoJS.enc.Hex.parse(hex);
@@ -679,11 +666,11 @@
             return Hex.decode(result.toString())
         }
     });
-    mk.digest.Keccak256Digester = function () {
+    mk.digest.KECCAK256Digester = function () {
         BaseObject.call(this)
     };
-    var Keccak256Digester = mk.digest.Keccak256Digester;
-    Class(Keccak256Digester, BaseObject, [DataDigester], {
+    var KECCAK256Digester = mk.digest.KECCAK256Digester;
+    Class(KECCAK256Digester, BaseObject, [MessageDigester], {
         digest: function (data) {
             var array = window.keccak256.update(data).digest();
             return new Uint8Array(array)
@@ -1163,7 +1150,7 @@
         BaseObject.call(this)
     };
     var PlainKeyFactory = mk.crypto.PlainKeyFactory;
-    Class(PlainKeyFactory, BaseObject, [SymmetricKey.Factory], null);
+    Class(PlainKeyFactory, BaseObject, [SymmetricKeyFactory], null);
     PlainKeyFactory.prototype.generateSymmetricKey = function () {
         return PlainKey.getInstance()
     };
@@ -1494,7 +1481,7 @@
         } else if (fingerprint.length !== 64) {
             throw new TypeError('ECC key data error: ' + fingerprint);
         }
-        var digest = Keccak256.digest(fingerprint);
+        var digest = KECCAK256.digest(fingerprint);
         var tail = digest.subarray(digest.length - 20);
         var address = Hex.encode(tail);
         return new ETHAddress('0x' + eip55(address))
@@ -1507,7 +1494,7 @@
     };
     var eip55 = function (hex) {
         var sb = new Uint8Array(40);
-        var hash = Keccak256.digest(UTF8.encode(hex));
+        var hash = KECCAK256.digest(UTF8.encode(hex));
         var ch;
         var _9 = '9'.charCodeAt(0);
         for (var i = 0; i < 40; ++i) {
@@ -2581,12 +2568,12 @@
     var PluginLoader = dimp.ext.PluginLoader;
     Class(PluginLoader, BaseObject, null, {
         load: function () {
-            this.registerDataCoders();
-            this.registerDataDigesters();
+            this.registerCoders();
+            this.registerDigesters();
             this.registerSymmetricKeyFactories();
             this.registerAsymmetricKeyFactories();
             this.registerEntityFactories()
-        }, registerDataCoders: function () {
+        }, registerCoders: function () {
             this.registerBase58Coder();
             this.registerBase64Coder();
             this.registerHexCoder();
@@ -2604,27 +2591,21 @@
             UTF8.setCoder(new UTF8Coder())
         }, registerJSONCoder: function () {
             var coder = new JSONCoder();
-            JSONMap.setCoder(coder);
-            JSONList.setCoder(coder)
+            JSONMap.setCoder(coder)
         }, registerPNFFactory: function () {
             PortableNetworkFile.setFactory(new BaseNetworkFileFactory())
         }, registerTEDFactory: function () {
             var tedFactory = new Base64DataFactory();
             TransportableData.setFactory(EncodeAlgorithms.BASE_64, tedFactory);
             TransportableData.setFactory('*', tedFactory)
-        }, registerDataDigesters: function () {
-            this.registerMD5Digester();
-            this.registerSHA1Digester();
+        }, registerDigesters: function () {
             this.registerSHA256Digester();
             this.registerKeccak256Digester();
             this.registerRIPEMD160Digester()
-        }, registerMD5Digester: function () {
-            MD5.setDigester(new MD5Digester())
-        }, registerSHA1Digester: function () {
         }, registerSHA256Digester: function () {
             SHA256.setDigester(new SHA256Digester())
         }, registerKeccak256Digester: function () {
-            Keccak256.setDigester(new Keccak256Digester())
+            KECCAK256.setDigester(new KECCAK256Digester())
         }, registerRIPEMD160Digester: function () {
             RIPEMD160.setDigester(new RIPEMD160Digester())
         }, registerSymmetricKeyFactories: function () {

@@ -82,7 +82,7 @@
             throw new TypeError('ECC key data error: ' + fingerprint);
         }
         // 1. digest = keccak256(fingerprint);
-        var digest = Keccak256.digest(fingerprint);
+        var digest = KECCAK256.digest(fingerprint);
         // 2. address = hex_encode(digest.suffix(20));
         var tail = digest.subarray(digest.length - 20);
         var address = Hex.encode(tail);
@@ -106,7 +106,7 @@
     // https://eips.ethereum.org/EIPS/eip-55
     var eip55 = function (hex) {
         var sb = new Uint8Array(40);
-        var hash = Keccak256.digest(UTF8.encode(hex));
+        var hash = KECCAK256.digest(UTF8.encode(hex));
         var ch;
         var _9 = '9'.charCodeAt(0);
         for (var i = 0; i < 40; ++i) {

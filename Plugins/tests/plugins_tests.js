@@ -62,7 +62,7 @@ var plugins_tests = [];
 
     var test_keccak = function (string, expect) {
         var data = ns.format.UTF8.encode(string);
-        var hash = ns.digest.Keccak256.digest(data);
+        var hash = ns.digest.KECCAK256.digest(data);
         var res = ns.format.Hex.encode(hash);
         console.log('keccak256(' + string + ') = ' + res);
         assert(res === expect, 'keccak256 error');

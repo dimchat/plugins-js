@@ -48,8 +48,8 @@
          */
         load: function () {
 
-            this.registerDataCoders();
-            this.registerDataDigesters();
+            this.registerCoders();
+            this.registerDigesters();
 
             this.registerSymmetricKeyFactories();
             this.registerAsymmetricKeyFactories();
@@ -62,7 +62,7 @@
          *  Data coders
          */
         // protected
-        registerDataCoders: function () {
+        registerCoders: function () {
 
             this.registerBase58Coder();
             this.registerBase64Coder();
@@ -109,7 +109,6 @@
             /// JSON
             var coder = new JSONCoder();
             JSONMap.setCoder(coder);
-            JSONList.setCoder(coder);
 
         },
         // protected
@@ -131,30 +130,14 @@
         },
 
         /**
-         *  Data digesters
+         *  Message digesters
          */
         // protected
-        registerDataDigesters: function () {
+        registerDigesters: function () {
 
-            this.registerMD5Digester();
-            this.registerSHA1Digester();
             this.registerSHA256Digester();
             this.registerKeccak256Digester();
             this.registerRIPEMD160Digester();
-
-        },
-        // protected
-        registerMD5Digester: function () {
-
-            /// MD5
-            MD5.setDigester(new MD5Digester());
-
-        },
-        // protected
-        registerSHA1Digester: function () {
-
-            // /// SHA1
-            // SHA1.setDigester(new SHA1Digester());
 
         },
         // protected
@@ -168,7 +151,7 @@
         registerKeccak256Digester: function () {
 
             /// Keccak256
-            Keccak256.setDigester(new Keccak256Digester());
+            KECCAK256.setDigester(new KECCAK256Digester());
 
         },
         // protected

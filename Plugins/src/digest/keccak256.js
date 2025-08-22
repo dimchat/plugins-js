@@ -30,14 +30,14 @@
 //! require <crypto.js>
 
     //
-    //  KECCAK256
+    //  Keccak256
     //
-    mk.digest.Keccak256Digester = function () {
+    mk.digest.KECCAK256Digester = function () {
         BaseObject.call(this);
     };
-    var Keccak256Digester = mk.digest.Keccak256Digester;
+    var KECCAK256Digester = mk.digest.KECCAK256Digester;
 
-    Class(Keccak256Digester, BaseObject, [DataDigester], {
+    Class(KECCAK256Digester, BaseObject, [MessageDigester], {
 
         // Override
         digest: function (data) {
