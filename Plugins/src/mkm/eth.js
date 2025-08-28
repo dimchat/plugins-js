@@ -51,7 +51,7 @@
 
         // Override
         getType: function () {
-            return EntityType.USER.getValue();
+            return EntityType.USER;
         }
 
     });

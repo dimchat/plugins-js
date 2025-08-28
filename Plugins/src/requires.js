@@ -58,7 +58,6 @@ var EncryptKey                 = mk.protocol.EncryptKey;
 var DecryptKey                 = mk.protocol.DecryptKey;
 var SymmetricKey               = mk.protocol.SymmetricKey;
 var SymmetricKeyFactory        = mk.protocol.SymmetricKey.Factory;
-var AsymmetricKey              = mk.protocol.AsymmetricKey;
 var PublicKey                  = mk.protocol.PublicKey;
 var PublicKeyFactory           = mk.protocol.PublicKey.Factory;
 var PrivateKey                 = mk.protocol.PrivateKey;

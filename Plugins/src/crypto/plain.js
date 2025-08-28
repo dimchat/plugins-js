@@ -30,7 +30,7 @@
 // =============================================================================
 //
 
-//! require <crypto.js>
+//! require <dimp.js>
 
     /**
      *  Symmetric key for broadcast message,
@@ -80,7 +80,7 @@
     };
     var PlainKeyFactory = mk.crypto.PlainKeyFactory;
 
-    Class(PlainKeyFactory, BaseObject, [SymmetricKey.Factory], null);
+    Class(PlainKeyFactory, BaseObject, [SymmetricKeyFactory], null);
 
     // Override
     PlainKeyFactory.prototype.generateSymmetricKey = function() {

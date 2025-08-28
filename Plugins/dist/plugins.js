@@ -47,7 +47,6 @@
     var DecryptKey = mk.protocol.DecryptKey;
     var SymmetricKey = mk.protocol.SymmetricKey;
     var SymmetricKeyFactory = mk.protocol.SymmetricKey.Factory;
-    var AsymmetricKey = mk.protocol.AsymmetricKey;
     var PublicKey = mk.protocol.PublicKey;
     var PublicKeyFactory = mk.protocol.PublicKey.Factory;
     var PrivateKey = mk.protocol.PrivateKey;
@@ -1462,7 +1461,7 @@
     var ETHAddress = mkm.mkm.ETHAddress;
     Class(ETHAddress, ConstantString, [Address], {
         getType: function () {
-            return EntityType.USER.getValue()
+            return EntityType.USER
         }
     });
     ETHAddress.getValidateAddress = function (address) {
@@ -1687,14 +1686,21 @@
     BaseMetaFactory.prototype.createMeta = function (pKey, seed, fingerprint) {
         var out;
         var type = this.getType();
-        if (type === MetaType.MKM || 'mkm' === type) {
-            out = new DefaultMeta(type, pKey, seed, fingerprint)
-        } else if (type === MetaType.BTC || 'btc' === type) {
-            out = new BTCMeta(type, pKey)
-        } else if (type === MetaType.ETH || 'eth' === type) {
-            out = new ETHMeta(type, pKey)
-        } else {
-            throw new TypeError('unknown meta type: ' + type);
+        switch (type) {
+            case MetaType.MKM:
+            case'mkm':
+                out = new DefaultMeta(type, pKey, seed, fingerprint);
+                break;
+            case MetaType.BTC:
+            case'btc':
+                out = new BTCMeta(type, pKey);
+                break;
+            case MetaType.ETH:
+            case'eth':
+                out = new ETHMeta(type, pKey);
+                break;
+            default:
+                throw new TypeError('unknown meta type: ' + type);
         }
         return out
     };
@@ -1702,14 +1708,21 @@
         var out;
         var helper = SharedAccountExtensions.getHelper();
         var type = helper.getMetaType(meta, '');
-        if (type === MetaType.MKM || 'mkm' === type) {
-            out = new DefaultMeta(meta)
-        } else if (type === MetaType.BTC || 'btc' === type) {
-            out = new BTCMeta(meta)
-        } else if (type === MetaType.ETH || 'eth' === type) {
-            out = new ETHMeta(meta)
-        } else {
-            throw new TypeError('unknown meta type: ' + type);
+        switch (type) {
+            case MetaType.MKM:
+            case'mkm':
+                out = new DefaultMeta(meta);
+                break;
+            case MetaType.BTC:
+            case'btc':
+                out = new BTCMeta(meta);
+                break;
+            case MetaType.ETH:
+            case'eth':
+                out = new ETHMeta(meta);
+                break;
+            default:
+                throw new TypeError('unknown meta type: ' + type);
         }
         return out.isValid() ? out : null
     };
