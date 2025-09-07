@@ -1,270 +1,250 @@
-# Decentralized Instant Messaging (JavaScript SDK)
+# DIM Plugins (JavaScript)
 
 
-[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/dimchat/sdk-js/blob/master/LICENSE)
-[![Version](https://img.shields.io/badge/alpha-0.1.0-red.svg)](https://github.com/dimchat/sdk-js/archive/master.zip)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/dimchat/sdk-js/pulls)
-[![Platform](https://img.shields.io/badge/Platform-ECMAScript%205.1-brightgreen.svg)](https://github.com/dimchat/sdk-js/wiki)
+[![License](https://img.shields.io/github/license/dimchat/plugins-js)](https://github.com/dimchat/plugins-js/blob/main/LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/dimchat/plugins-js/pulls)
+[![Platform](https://img.shields.io/badge/Platform-ECMAScript%205.1-brightgreen.svg)](https://github.com/dimchat/plugins-js/wiki)
+[![Issues](https://img.shields.io/github/issues/dimchat/plugins-js)](https://github.com/dimchat/plugins-js/issues)
+[![Repo Size](https://img.shields.io/github/repo-size/dimchat/plugins-js)](https://github.com/dimchat/plugins-js/archive/refs/heads/main.zip)
+[![Tags](https://img.shields.io/github/tag/dimchat/plugins-js)](https://github.com/dimchat/plugins-js/tags)
 
+[![Watchers](https://img.shields.io/github/watchers/dimchat/plugins-js)](https://github.com/dimchat/plugins-js/watchers)
+[![Forks](https://img.shields.io/github/forks/dimchat/plugins-js)](https://github.com/dimchat/plugins-js/forks)
+[![Stars](https://img.shields.io/github/stars/dimchat/plugins-js)](https://github.com/dimchat/plugins-js/stargazers)
+[![Followers](https://img.shields.io/github/followers/dimchat)](https://github.com/orgs/dimchat/followers)
 
-### Dependencies
+## Plugins
 
-1. DIMP - <https://github.com/dimchat/core-js/blob/master/DIMP/dist/dimp.js>
-2. SDK - <https://github.com/dimchat/sdk-js/blob/master/SDK/dist/sdk.js>
+1. Data Coding
+   * Base-58
+   * Base-64
+   * Hex
+   * UTF-8
+   * JsON
+   * PNF _(Portable Network File)_
+   * TED _(Transportable Encoded Data)_
+2. Digest Digest
+   * MD-5
+   * SHA-1
+   * SHA-256
+   * Keccak-256
+   * RipeMD-160
+3. Cryptography
+   * AES-256 _(AES/CBC/PKCS7Padding)_
+   * RSA-1024 _(RSA/ECB/PKCS1Padding)_, _(SHA256withRSA)_
+   * ECC _(Secp256k1)_
+4. Address
+   * BTC
+   * ETH
+5. Meta
+   * MKM _(Default)_
+   * BTC
+   * ETH
+6. Document
+   * Visa _(User)_
+   * Profile
+   * Bulletin _(Group)_
 
-Patches:
+## Extends
 
-1. [Plugins for Crypto & Address, Meta](https://github.com/dimchat/sdk-js/blob/master/Plugins/dist/plugins.js)
-2. [Extensions for local storage, notifications & connections](https://github.com/dimchat/sdk-js/blob/master/StarGate/dist/stargate.js)
-
-All in one - <https://github.com/dimchat/sdk-js/blob/master/SDK/dist/all.js>
-
-## Account
-
-User private key, ID, meta, and profile are generated in client,
-and broadcast only ```meta``` & ```profile``` onto DIM station.
-
-### Register User Account
-
-_Step 1_. generate private key (with asymmetric algorithm)
-
-```javascript
-var PrivateKey = DIMP.crypto.PrivateKey;
-
-var sk = PrivateKey.generate(PrivateKey.RSA);
-```
-
-**NOTICE**: After registered, the client should save the private key in secret storage.
-
-_Step 2_. generate meta with private key (and meta seed)
-
-```javascript
-var MetaType = DIMP.protocol.MetaType;
-var Meta     = DIMP.Meta;
-
-var seed = "username";
-var meta = Meta.generate(MetaType.Default, sk, seed);
-```
-
-_Step 3_. generate ID with meta (and network type)
-
-```javascript
-var NetworkType = DIMP.protocol.NetworkType;
-
-var identifier = meta.generateIdentifier(NetworkType.Main);
-```
-
-### Create and upload User Profile
-
-_Step 4_. create profile with ID and sign with private key
-
-```javascript
-var Profile = DIMP.Profile;
-
-var profile = new Profile(identifier);
-// set nickname and avatar URL
-profile.setName("Albert Moky");
-profile.setProperty("avatar", "https://secure.gravatar.com/avatar/34aa0026f924d017dcc7a771f495c086");
-// sign
-profile.sign(privateKey);
-```
-
-_Step 5_. send meta & profile to station
-
-```javascript
-var ProfileCommand = DIMP.protocol.ProfileCommand;
-
-var messenger = Messenger.getInstance();
-
-var cmd = ProfileCommand.response(identifier, profile, meta);
-messenger.sendCommand(cmd);
-```
-
-The profile should be sent to station after connected
-and handshake accepted, details are provided in later chapters
-
-## Connect and Handshake
-
-_Step 1_. connect to DIM station (TCP)
-
-_Step 2_. prepare for receiving message data package
-
-```javascript
-var onReceive = function (responseData) {
-    var response = messenger.onReceivePackage(responseData);
-    if (response != null && response.length > 0) {
-        // send processing result back to the station
-        send(response);
-    }
-}
-```
-
-_Step 3_. send first **handshake** command
-
-(1) create handshake command
-
-```javascript
-var HandshakeCommand = DIMP.protocol.HandshakeCommand;
-
-// first handshake will have no session key
-var cmd = HandshakeCommand.start();
-```
-
-(2) pack, encrypt and sign
-
-```javascript
-var Envelope       = DIMP.Envelope;
-var InstantMessage = DIMP.InstantMessage;
-
-var env = Envelope.newEnvelope(userId, stationId);
-var iMsg = InstantMessage.newMessage(cmd, env);
-var sMsg = messenger.encryptMessage(iMsg);
-var rMsg = messenger.signMessage(sMsg);
-```
-
-(3) Meta protocol
-
-Attaching meta in the first message package is to make sure the station can find it,
-particularly when it's first time the user connect to this station.
-
-```javascript
-rMsg.setMeta(user.getMeta());
-```
-
-(4) send out serialized message data package
-
-```javascript
-var data = messenger.serializeMessage(rMsg);
-send(data);
-```
-
-_Step 4_. waiting handshake response
-
-The CPU (Command Processing Units) will catch the handshake command response from station, and CPU will process them automatically, so just wait untill handshake success or network error.
-
-## Message
-
-### Content
-
-* Text message
-
-```javascript
-var TextContent = DIMP.protocol.TextContent;
-
-var content = new TextContent("Hey, girl!");
-```
-
-**NOTICE**: file message content (Image, Audio, Video)
-will be sent out only includes the filename and a URL
-where the file data (encrypted with the same symmetric key) be stored.
-
-### Command
-
-* Query meta with contact ID
-
-```javascript
-var MetaCommand = DIMP.protocol.MetaCommand;
-
-var cmd = new MetaCommand(identifier);
-```
-
-* Query profile with contact ID
-
-```javascript
-var ProfileCommand = DIMP.protocol.ProfileCommand;
-
-var cmd = new ProfileCommand(identifier);
-```
-
-### Send command
+### Address
 
 ```javascript
 /**
- *  Pack and send command to station
+ *  Unsupported Address
+ *  ~~~~~~~~~~~~~~~~~~~
+ */
+app.compat.UnknownAddress = function (string) {
+    ConstantString.call(this, string);
+};
+var UnknownAddress = app.compat.UnknownAddress;
+
+Class(UnknownAddress, ConstantString, [Address]);
+
+Implementation(UnknownAddress, {
+    // Override
+    getType: function () {
+        return 0;  // EntityType.USER;
+    }
+});
+
+/**
+ *  Compatible Address Factory
+ *  ~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
+app.compat.CompatibleAddressFactory = function () {
+    BaseAddressFactory.call(this);
+};
+var CompatibleAddressFactory = app.compat.CompatibleAddressFactory;
+
+Class(CompatibleAddressFactory, BaseAddressFactory, null);
+
+/**
+ *  Call it when received 'UIApplicationDidReceiveMemoryWarningNotification',
+ *  this will remove 50% of cached objects
  *
- * @param cmd - command
- * @return true on success
+ * @return {uint} number of survivors
  */
-Messenger.prototype.sendCommand(Command cmd) {
-    console.assert(server !== null, 'station not connect');
-    return this.sendContent(cmd, server.identifier);
-}
-```
-
-MetaCommand or ProfileCommand with only ID means querying, and the CPUs will catch and process all the response automatically.
-
-## Command Processing Units
-
-You can send a customized command (such as **search command**) and prepare a processor to handle the response.
-
-### Search command processor
-
-```javascript
-var CommandProcessor = DIMP.cpu.CommandProcessor;
-
-/**
- *  Search Command Processor
- */
-var SearchCommandProcessor = function (messenger) {
-    CommandProcessor.call(this, messenger);
-};
-SearchCommandProcessor.inherits(CommandProcessor);
-
-//
-//  Main
-//
-SearchCommandProcessor.prototype.process = function (cmd, sender, msg) {
-	// TODO: 
-};
-```
-
-### Handshake command processor
-
-```javascript
-/**
- *  Handshake Command Processor
- */
-var HandshakeCommandProcessor = function (messenger) {
-    CommandProcessor.call(this, messenger);
-};
-HandshakeCommandProcessor.inherits(CommandProcessor);
-
-var success = function () {
-    var session = this.getContext('session_key');
-    var server = this.messenger.server;
-    server.handshakeAccepted(session, true);
-    return null;
+CompatibleAddressFactory.prototype.reduceMemory = function () {
+    var finger = 0;
+    finger = thanos(this._addresses, finger);
+    return finger >> 1;
 };
 
-var restart = function (session) {
-    this.setContext('session_key', session);
-    return new HandshakeCommand.restart(session)
-};
-
-//
-//  Main
-//
-HandshakeCommandProcessor.prototype.process = function (cmd, sender, msg) {
-    var message = cmd.getMessage();
-    if (message === 'DIM!' || message === 'OK!') {
-        // S -> C
-        return success.call(this);
-    } else if (message === 'DIM?') {
-        // S -> C
-        return restart.call(this, cmd.getSessionKey());
-    } else {
-        // C -> S: Hello world!
-        throw Error('handshake command error: ' + cmd);
+// Override
+CompatibleAddressFactory.prototype.parse = function(address) {
+    if (!address) {
+        //throw new ReferenceError('address empty');
+        return null;
     }
+    var len = address.length;
+    if (len === 8) {
+        // "anywhere"
+        if (address.toLowerCase() === 'anywhere') {
+            return Address.ANYWHERE;
+        }
+    } else if (len === 10) {
+        // "everywhere"
+        if (address.toLowerCase() === 'everywhere') {
+            return Address.EVERYWHERE;
+        }
+    }
+    var res;
+    if (26 <= len && len <= 35) {
+        res = BTCAddress.parse(address);
+    } else if (len === 42) {
+        res = ETHAddress.parse(address);
+    } else {
+        //throw new TypeError('invalid address: ' + address);
+        res = null;
+    }
+    // TODO: other types of address
+    if (!res && 4 <= len && len <= 64) {
+        res = new UnknownAddress(address);
+    }
+    return res;
 };
 ```
 
-And don't forget to register them.
+### Meta
 
 ```javascript
-CommandProcessor.register(Command.HANDSHAKE, HandshakeCommandProcessor);
-CommandProcessor.register(SearchCommand.SEARCH, SearchCommandProcessor);
-CommandProcessor.register(SearchCommand.ONLINE_USERS, SearchCommandProcessor);
+/**
+ *  Compatible Meta factory
+ *  ~~~~~~~~~~~~~~~~~~~~~~~
+ */
+app.compat.CompatibleMetaFactory = function (type) {
+    BaseMetaFactory.call(this, type);
+};
+var CompatibleMetaFactory = app.compat.CompatibleMetaFactory;
+
+Class(CompatibleMetaFactory, BaseMetaFactory, null);
+
+Implementation(CompatibleMetaFactory, {
+
+    // Override
+    parseMeta: function(meta) {
+        var out;
+        var helper = SharedAccountExtensions.getHelper();
+        var type = helper.getMetaType(meta, '');
+        switch (type) {
+
+            case 'MKM':
+            case 'mkm':
+            case '1':
+                out = new DefaultMeta(meta);
+                break;
+
+            case 'BTC':
+            case 'btc':
+            case '2':
+                out = new BTCMeta(meta);
+                break;
+
+            case 'ETH':
+            case 'eth':
+            case '4':
+                out = new ETHMeta(meta);
+                break;
+
+            default:
+                throw new TypeError('unknown meta type: ' + type);
+        }
+        return out.isValid() ? out : null
+    }
+});
 ```
 
-Copyright &copy; 2019 Albert Moky
+### Plugin Loader
+
+```javascript
+app.compat.CommonPluginLoader = function () {
+    PluginLoader.call(this);
+};
+var CommonPluginLoader = app.compat.CommonPluginLoader;
+
+Class(CommonPluginLoader, PluginLoader, null);
+
+Implementation(CommonPluginLoader, {
+
+    // Override
+    registerIDFactory: function () {
+        ID.setFactory(new EntityIDFactory());
+    },
+    
+    // Override
+    registerAddressFactory: function () {
+        Address.setFactory(new CompatibleAddressFactory());
+    },
+    
+    // Override
+    registerMetaFactories: function () {
+        var mkm = new CompatibleMetaFactory(MetaType.MKM);
+        var btc = new CompatibleMetaFactory(MetaType.BTC);
+        var eth = new CompatibleMetaFactory(MetaType.ETH);
+
+        Meta.setFactory('1', mkm);
+        Meta.setFactory('2', btc);
+        Meta.setFactory('4', eth);
+
+        Meta.setFactory('mkm', mkm);
+        Meta.setFactory('btc', btc);
+        Meta.setFactory('eth', eth);
+
+        Meta.setFactory('MKM', mkm);
+        Meta.setFactory('BTC', btc);
+        Meta.setFactory('ETH', eth);
+    }
+});
+```
+
+## Usage
+
+You must load all plugins before your business run:
+
+```javascript
+ns.compat.LibraryLoader = function (extensionLoader, pluginLoader) {
+    this.__extensions = extensionLoader || new ExtensionLoader();
+    this.__plugins = pluginLoader || new CommonPluginLoader();
+};
+var LibraryLoader = ns.compat.LibraryLoader;
+
+LibraryLoader.prototype.run = function () {
+    this.__extensions.load();
+    this.__plugins.load();
+};
+```
+
+```javascript
+var loader = new LibraryLoader(null, null);
+loader.run();
+
+// do your jobs after all extensions & plugins loaded
+```
+
+You must ensure that every ```Address``` you extend has a ```Meta``` type that can correspond to it one by one.
+
+----
+
+Copyright &copy; 2018-2025 Albert Moky
+[![Followers](https://img.shields.io/github/followers/moky)](https://github.com/moky?tab=followers)

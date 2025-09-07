@@ -43,7 +43,7 @@
         GeneralCryptoHelper,
         SymmetricKeyHelper,
         PrivateKeyHelper, PublicKeyHelper
-    ], null);
+    ]);
 
     // Override
     CryptoKeyGeneralFactory.prototype.getKeyAlgorithm = function (key, defaultValue) {

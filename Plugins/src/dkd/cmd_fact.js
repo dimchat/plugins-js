@@ -41,7 +41,7 @@
     };
     var GeneralCommandFactory = dkd.dkd.GeneralCommandFactory;
 
-    Class(GeneralCommandFactory, BaseObject, [ContentFactory, CommandFactory], null);
+    Class(GeneralCommandFactory, BaseObject, [ContentFactory, CommandFactory]);
 
     // Override
     GeneralCommandFactory.prototype.parseContent = function (content) {
@@ -82,7 +82,7 @@
     };
     var HistoryCommandFactory = dkd.dkd.HistoryCommandFactory;
 
-    Class(HistoryCommandFactory, GeneralCommandFactory, null, null);
+    Class(HistoryCommandFactory, GeneralCommandFactory, null);
 
     // Override
     HistoryCommandFactory.prototype.parseCommand = function (content) {
@@ -105,7 +105,7 @@
     };
     var GroupCommandFactory = dkd.dkd.GroupCommandFactory;
 
-    Class(GroupCommandFactory, HistoryCommandFactory, null, null);
+    Class(GroupCommandFactory, HistoryCommandFactory, null);
 
     // Override
     GroupCommandFactory.prototype.parseContent = function (content) {

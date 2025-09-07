@@ -71,7 +71,9 @@
     };
     var BaseNetworkFile = mk.format.BaseNetworkFile;
 
-    Class(BaseNetworkFile, Dictionary, [PortableNetworkFile], {
+    Class(BaseNetworkFile, Dictionary, [PortableNetworkFile]);
+
+    Implementation(BaseNetworkFile, {
 
         // Override
         getData: function () {
@@ -169,7 +171,9 @@
     };
     var BaseNetworkFileFactory = mk.format.BaseNetworkFileFactory;
 
-    Class(BaseNetworkFileFactory, BaseObject, [PortableNetworkFileFactory], {
+    Class(BaseNetworkFileFactory, BaseObject, [PortableNetworkFileFactory]);
+
+    Implementation(BaseNetworkFileFactory, {
 
         // Override
         createPortableNetworkFile: function (ted, filename, url, password) {

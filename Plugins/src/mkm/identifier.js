@@ -42,7 +42,7 @@
     };
     var IdentifierFactory = mkm.mkm.IdentifierFactory;
 
-    Class(IdentifierFactory, BaseObject, [IDFactory], null);
+    Class(IdentifierFactory, BaseObject, [IDFactory]);
 
     // Override
     IdentifierFactory.prototype.generateIdentifier = function (meta, network, terminal) {

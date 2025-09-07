@@ -106,7 +106,9 @@
     };
     var HexCoder = mk.format.HexCoder;
 
-    Class(HexCoder, BaseObject, [DataCoder], {
+    Class(HexCoder, BaseObject, [DataCoder]);
+
+    Implementation(HexCoder, {
 
         // Override
         encode: function (data) {

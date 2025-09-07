@@ -69,7 +69,9 @@
     };
     var DefaultMeta = mkm.mkm.DefaultMeta;
 
-    Class(DefaultMeta, BaseMeta, null, {
+    Class(DefaultMeta, BaseMeta, null);
+
+    Implementation(DefaultMeta, {
 
         // Override
         hasSeed: function () {
@@ -130,7 +132,9 @@
     };
     var BTCMeta = mkm.mkm.BTCMeta;
 
-    Class(BTCMeta, BaseMeta, null, {
+    Class(BTCMeta, BaseMeta, null);
+
+    Implementation(BTCMeta, {
 
         // Override
         hasSeed: function () {
@@ -192,7 +196,9 @@
     };
     var ETHMeta = mkm.mkm.ETHMeta;
 
-    Class(ETHMeta, BaseMeta, null, {
+    Class(ETHMeta, BaseMeta, null);
+
+    Implementation(ETHMeta, {
 
         // Override
         hasSeed: function () {
@@ -226,7 +232,7 @@
     };
     var BaseMetaFactory = mkm.mkm.BaseMetaFactory;
 
-    Class(BaseMetaFactory, BaseObject, [MetaFactory], null);
+    Class(BaseMetaFactory, BaseObject, [MetaFactory]);
 
     // protected
     BaseMetaFactory.prototype.getType = function () {

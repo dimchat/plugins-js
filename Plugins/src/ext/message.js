@@ -50,7 +50,7 @@
         GeneralMessageHelper,
         ContentHelper, EnvelopeHelper,
         InstantMessageHelper, SecureMessageHelper, ReliableMessageHelper
-    ], null);
+    ]);
 
     // Override
     MessageGeneralFactory.prototype.getContentType = function (content, defaultValue) {

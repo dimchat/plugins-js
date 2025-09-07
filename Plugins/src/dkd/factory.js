@@ -44,7 +44,7 @@
 
     Class(MessageFactory, BaseObject, [
         EnvelopeFactory, InstantMessageFactory, SecureMessageFactory, ReliableMessageFactory
-    ], null);
+    ]);
 
     // private
     MessageFactory.prototype.next = function () {

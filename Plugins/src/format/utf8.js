@@ -129,7 +129,9 @@
     };
     var UTF8Coder = mk.format.UTF8Coder;
 
-    Class(UTF8Coder, BaseObject, [StringCoder], {
+    Class(UTF8Coder, BaseObject, [StringCoder]);
+
+    Implementation(UTF8Coder, {
 
         // Override
         encode: function (string) {

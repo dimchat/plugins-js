@@ -38,7 +38,9 @@
     };
     var SHA256Digester = mk.digest.SHA256Digester;
 
-    Class(SHA256Digester, BaseObject, [MessageDigester], {
+    Class(SHA256Digester, BaseObject, [MessageDigester]);
+
+    Implementation(SHA256Digester, {
 
         // Override
         digest: function (data) {

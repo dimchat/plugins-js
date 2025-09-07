@@ -49,7 +49,7 @@
         GeneralAccountHelper,
         AddressHelper, IdentifierHelper,
         MetaHelper, DocumentHelper
-    ], null);
+    ]);
 
     // Override
     AccountGeneralFactory.prototype.getMetaType = function (meta, defaultValue) {
@@ -167,7 +167,7 @@
         if (!factory) {
             throw new ReferenceError('ID factory not ready');
         }
-        return factory.createIdentifier(meta, network, terminal);
+        return factory.generateIdentifier(meta, network, terminal);
     };
 
     ///

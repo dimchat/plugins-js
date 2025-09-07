@@ -42,7 +42,7 @@
     };
     var BaseAddressFactory = mkm.mkm.BaseAddressFactory;
 
-    Class(BaseAddressFactory, BaseObject, [AddressFactory], null);
+    Class(BaseAddressFactory, BaseObject, [AddressFactory]);
 
     // Override
     BaseAddressFactory.prototype.generateAddress = function (meta, network) {

@@ -47,7 +47,9 @@
     };
     var ETHAddress = mkm.mkm.ETHAddress;
 
-    Class(ETHAddress, ConstantString, [Address], {
+    Class(ETHAddress, ConstantString, [Address]);
+
+    Implementation(ETHAddress, {
 
         // Override
         getType: function () {

@@ -37,7 +37,9 @@
     };
     var KECCAK256Digester = mk.digest.KECCAK256Digester;
 
-    Class(KECCAK256Digester, BaseObject, [MessageDigester], {
+    Class(KECCAK256Digester, BaseObject, [MessageDigester]);
+
+    Implementation(KECCAK256Digester, {
 
         // Override
         digest: function (data) {

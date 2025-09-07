@@ -81,7 +81,9 @@
 
     AESKey.AES_CBC_PKCS7 = 'AES/CBC/PKCS7Padding';
 
-    Class(AESKey, BaseSymmetricKey, null, {
+    Class(AESKey, BaseSymmetricKey, null);
+
+    Implementation(AESKey, {
 
         // protected
         generateKeyData: function () {
@@ -221,7 +223,7 @@
     };
     var AESKeyFactory = mk.crypto.AESKeyFactory;
 
-    Class(AESKeyFactory, BaseObject, [SymmetricKeyFactory], null);
+    Class(AESKeyFactory, BaseObject, [SymmetricKeyFactory]);
 
     // Override
     AESKeyFactory.prototype.generateSymmetricKey = function() {

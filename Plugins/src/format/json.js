@@ -39,7 +39,9 @@
     };
     var JSONCoder = mk.format.JSONCoder;
 
-    Class(JSONCoder, BaseObject, [ObjectCoder], {
+    Class(JSONCoder, BaseObject, [ObjectCoder]);
+
+    Implementation(JSONCoder, {
 
         // Override
         encode: function (object) {

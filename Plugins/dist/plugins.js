@@ -13,6 +13,7 @@
     }
     var Interface = mk.type.Interface;
     var Class = mk.type.Class;
+    var Implementation = mk.type.Implementation;
     var Converter = mk.type.Converter;
     var Wrapper = mk.type.Wrapper;
     var Mapper = mk.type.Mapper;
@@ -280,7 +281,8 @@
         BaseObject.call(this)
     };
     var Base58Coder = mk.format.Base58Coder;
-    Class(Base58Coder, BaseObject, [DataCoder], {
+    Class(Base58Coder, BaseObject, [DataCoder]);
+    Implementation(Base58Coder, {
         encode: function (data) {
             return bs58.encode(data)
         }, decode: function (string) {
@@ -352,7 +354,8 @@
         BaseObject.call(this)
     };
     var Base64Coder = mk.format.Base64Coder;
-    Class(Base64Coder, BaseObject, [DataCoder], {
+    Class(Base64Coder, BaseObject, [DataCoder]);
+    Implementation(Base64Coder, {
         encode: function (data) {
             return base64_encode(data)
         }, decode: function (string) {
@@ -411,7 +414,8 @@
         BaseObject.call(this)
     };
     var HexCoder = mk.format.HexCoder;
-    Class(HexCoder, BaseObject, [DataCoder], {
+    Class(HexCoder, BaseObject, [DataCoder]);
+    Implementation(HexCoder, {
         encode: function (data) {
             return hex_encode(data)
         }, decode: function (string) {
@@ -422,7 +426,8 @@
         BaseObject.call(this)
     };
     var JSONCoder = mk.format.JSONCoder;
-    Class(JSONCoder, BaseObject, [ObjectCoder], {
+    Class(JSONCoder, BaseObject, [ObjectCoder]);
+    Implementation(JSONCoder, {
         encode: function (object) {
             return JSON.stringify(object)
         }, decode: function (string) {
@@ -458,7 +463,8 @@
         this.__wrapper = wrapper
     };
     var BaseNetworkFile = mk.format.BaseNetworkFile;
-    Class(BaseNetworkFile, Dictionary, [PortableNetworkFile], {
+    Class(BaseNetworkFile, Dictionary, [PortableNetworkFile]);
+    Implementation(BaseNetworkFile, {
         getData: function () {
             var ted = this.__wrapper.getData();
             return !ted ? null : ted.getData()
@@ -510,7 +516,8 @@
         BaseObject.call(this)
     };
     var BaseNetworkFileFactory = mk.format.BaseNetworkFileFactory;
-    Class(BaseNetworkFileFactory, BaseObject, [PortableNetworkFileFactory], {
+    Class(BaseNetworkFileFactory, BaseObject, [PortableNetworkFileFactory]);
+    Implementation(BaseNetworkFileFactory, {
         createPortableNetworkFile: function (ted, filename, url, password) {
             return new BaseNetworkFile(ted, filename, url, password)
         }, parsePortableNetworkFile: function (pnf) {
@@ -538,7 +545,8 @@
         this.__wrapper = wrapper
     };
     var Base64Data = mk.format.Base64Data;
-    Class(Base64Data, Dictionary, [TransportableData], {
+    Class(Base64Data, Dictionary, [TransportableData]);
+    Implementation(Base64Data, {
         getAlgorithm: function () {
             return this.__wrapper.getAlgorithm()
         }, getData: function () {
@@ -555,7 +563,8 @@
         BaseObject.call(this)
     };
     var Base64DataFactory = mk.format.Base64DataFactory;
-    Class(Base64DataFactory, BaseObject, [TransportableDataFactory], {
+    Class(Base64DataFactory, BaseObject, [TransportableDataFactory]);
+    Implementation(Base64DataFactory, {
         createTransportableData: function (data) {
             return new Base64Data(data)
         }, parseTransportableData: function (ted) {
@@ -634,7 +643,8 @@
         BaseObject.call(this)
     };
     var UTF8Coder = mk.format.UTF8Coder;
-    Class(UTF8Coder, BaseObject, [StringCoder], {
+    Class(UTF8Coder, BaseObject, [StringCoder]);
+    Implementation(UTF8Coder, {
         encode: function (string) {
             return utf8_encode(string)
         }, decode: function (data) {
@@ -645,7 +655,8 @@
         BaseObject.call(this)
     };
     var SHA256Digester = mk.digest.SHA256Digester;
-    Class(SHA256Digester, BaseObject, [MessageDigester], {
+    Class(SHA256Digester, BaseObject, [MessageDigester]);
+    Implementation(SHA256Digester, {
         digest: function (data) {
             var hex = Hex.encode(data);
             var array = CryptoJS.enc.Hex.parse(hex);
@@ -657,7 +668,8 @@
         BaseObject.call(this)
     };
     var RIPEMD160Digester = mk.digest.RIPEMD160Digester;
-    Class(RIPEMD160Digester, BaseObject, [MessageDigester], {
+    Class(RIPEMD160Digester, BaseObject, [MessageDigester]);
+    Implementation(RIPEMD160Digester, {
         digest: function (data) {
             var hex = Hex.encode(data);
             var array = CryptoJS.enc.Hex.parse(hex);
@@ -669,7 +681,8 @@
         BaseObject.call(this)
     };
     var KECCAK256Digester = mk.digest.KECCAK256Digester;
-    Class(KECCAK256Digester, BaseObject, [MessageDigester], {
+    Class(KECCAK256Digester, BaseObject, [MessageDigester]);
+    Implementation(KECCAK256Digester, {
         digest: function (data) {
             var array = window.keccak256.update(data).digest();
             return new Uint8Array(array)
@@ -704,7 +717,8 @@
     };
     var AESKey = mk.crypto.AESKey;
     AESKey.AES_CBC_PKCS7 = 'AES/CBC/PKCS7Padding';
-    Class(AESKey, BaseSymmetricKey, null, {
+    Class(AESKey, BaseSymmetricKey, null);
+    Implementation(AESKey, {
         generateKeyData: function () {
             var keySize = this.getKeySize();
             var pwd = random_data(keySize);
@@ -783,7 +797,7 @@
         BaseObject.call(this)
     };
     var AESKeyFactory = mk.crypto.AESKeyFactory;
-    Class(AESKeyFactory, BaseObject, [SymmetricKeyFactory], null);
+    Class(AESKeyFactory, BaseObject, [SymmetricKeyFactory]);
     AESKeyFactory.prototype.generateSymmetricKey = function () {
         return new AESKey({'algorithm': SymmetricAlgorithms.AES})
     };
@@ -922,7 +936,8 @@
         BasePublicKey.call(this, key)
     };
     var ECCPublicKey = mk.crypto.ECCPublicKey;
-    Class(ECCPublicKey, BasePublicKey, null, {
+    Class(ECCPublicKey, BasePublicKey, null);
+    Implementation(ECCPublicKey, {
         getData: function () {
             var pem = this.getValue('data');
             if (!pem || pem.length === 0) {
@@ -971,7 +986,8 @@
         this.__publicKey = keyPair.publicKey
     };
     var ECCPrivateKey = mk.crypto.ECCPrivateKey;
-    Class(ECCPrivateKey, BasePrivateKey, null, {
+    Class(ECCPrivateKey, BasePrivateKey, null);
+    Implementation(ECCPrivateKey, {
         getData: function () {
             var data = this.getValue('data');
             if (data && data.length > 0) {
@@ -1027,7 +1043,7 @@
         BaseObject.call(this)
     };
     var ECCPrivateKeyFactory = mk.crypto.ECCPrivateKeyFactory;
-    Class(ECCPrivateKeyFactory, BaseObject, [PrivateKeyFactory], null);
+    Class(ECCPrivateKeyFactory, BaseObject, [PrivateKeyFactory]);
     ECCPrivateKeyFactory.prototype.generatePrivateKey = function () {
         return new ECCPrivateKey({'algorithm': AsymmetricAlgorithms.ECC})
     };
@@ -1041,7 +1057,7 @@
         BaseObject.call(this)
     };
     var ECCPublicKeyFactory = mk.crypto.ECCPublicKeyFactory;
-    Class(ECCPublicKeyFactory, BaseObject, [PublicKeyFactory], null);
+    Class(ECCPublicKeyFactory, BaseObject, [PublicKeyFactory]);
     ECCPublicKeyFactory.prototype.parsePublicKey = function (key) {
         if (key['data'] === null) {
             return null
@@ -1128,7 +1144,8 @@
         BaseSymmetricKey.call(this, key)
     };
     var PlainKey = mk.crypto.PlainKey;
-    Class(PlainKey, BaseSymmetricKey, null, {
+    Class(PlainKey, BaseSymmetricKey, null);
+    Implementation(PlainKey, {
         getData: function () {
             return null
         }, encrypt: function (data, extra) {
@@ -1149,7 +1166,7 @@
         BaseObject.call(this)
     };
     var PlainKeyFactory = mk.crypto.PlainKeyFactory;
-    Class(PlainKeyFactory, BaseObject, [SymmetricKeyFactory], null);
+    Class(PlainKeyFactory, BaseObject, [SymmetricKeyFactory]);
     PlainKeyFactory.prototype.generateSymmetricKey = function () {
         return PlainKey.getInstance()
     };
@@ -1185,7 +1202,8 @@
         BasePublicKey.call(this, key)
     };
     var RSAPublicKey = mk.crypto.RSAPublicKey;
-    Class(RSAPublicKey, BasePublicKey, [EncryptKey], {
+    Class(RSAPublicKey, BasePublicKey, [EncryptKey]);
+    Implementation(RSAPublicKey, {
         getData: function () {
             var data = this.getValue('data');
             if (data) {
@@ -1225,7 +1243,8 @@
         }
     };
     var RSAPrivateKey = mk.crypto.RSAPrivateKey;
-    Class(RSAPrivateKey, BasePrivateKey, [DecryptKey], {
+    Class(RSAPrivateKey, BasePrivateKey, [DecryptKey]);
+    Implementation(RSAPrivateKey, {
         getData: function () {
             var data = this.getValue('data');
             if (data) {
@@ -1278,7 +1297,7 @@
         BaseObject.call(this)
     };
     var RSAPrivateKeyFactory = mk.crypto.RSAPrivateKeyFactory;
-    Class(RSAPrivateKeyFactory, BaseObject, [PrivateKeyFactory], null);
+    Class(RSAPrivateKeyFactory, BaseObject, [PrivateKeyFactory]);
     RSAPrivateKeyFactory.prototype.generatePrivateKey = function () {
         return new RSAPrivateKey({'algorithm': AsymmetricAlgorithms.RSA})
     };
@@ -1292,7 +1311,7 @@
         BaseObject.call(this)
     };
     var RSAPublicKeyFactory = mk.crypto.RSAPublicKeyFactory;
-    Class(RSAPublicKeyFactory, BaseObject, [PublicKeyFactory], null);
+    Class(RSAPublicKeyFactory, BaseObject, [PublicKeyFactory]);
     RSAPublicKeyFactory.prototype.parsePublicKey = function (key) {
         if (key['data'] === null) {
             return null
@@ -1304,7 +1323,7 @@
         this._addresses = {}
     };
     var BaseAddressFactory = mkm.mkm.BaseAddressFactory;
-    Class(BaseAddressFactory, BaseObject, [AddressFactory], null);
+    Class(BaseAddressFactory, BaseObject, [AddressFactory]);
     BaseAddressFactory.prototype.generateAddress = function (meta, network) {
         var address = meta.generateAddress(network);
         if (address) {
@@ -1351,7 +1370,8 @@
         this.__type = network
     };
     var BTCAddress = mkm.mkm.BTCAddress;
-    Class(BTCAddress, ConstantString, [Address], {
+    Class(BTCAddress, ConstantString, [Address]);
+    Implementation(BTCAddress, {
         getType: function () {
             return this.__type
         }
@@ -1400,7 +1420,7 @@
         this.__type = type
     };
     var GeneralDocumentFactory = mkm.mkm.GeneralDocumentFactory;
-    Class(GeneralDocumentFactory, BaseObject, [DocumentFactory], null);
+    Class(GeneralDocumentFactory, BaseObject, [DocumentFactory]);
     GeneralDocumentFactory.prototype.getType = function (docType, identifier) {
         if (!identifier) {
             return this.__type
@@ -1459,7 +1479,8 @@
         ConstantString.call(this, string)
     };
     var ETHAddress = mkm.mkm.ETHAddress;
-    Class(ETHAddress, ConstantString, [Address], {
+    Class(ETHAddress, ConstantString, [Address]);
+    Implementation(ETHAddress, {
         getType: function () {
             return EntityType.USER
         }
@@ -1538,7 +1559,7 @@
         this._identifiers = {}
     };
     var IdentifierFactory = mkm.mkm.IdentifierFactory;
-    Class(IdentifierFactory, BaseObject, [IDFactory], null);
+    Class(IdentifierFactory, BaseObject, [IDFactory]);
     IdentifierFactory.prototype.generateIdentifier = function (meta, network, terminal) {
         var address = Address.generate(meta, network);
         return ID.create(meta.getSeed(), address, terminal)
@@ -1597,7 +1618,8 @@
         this.__addresses = {}
     };
     var DefaultMeta = mkm.mkm.DefaultMeta;
-    Class(DefaultMeta, BaseMeta, null, {
+    Class(DefaultMeta, BaseMeta, null);
+    Implementation(DefaultMeta, {
         hasSeed: function () {
             return true
         }, generateAddress: function (network) {
@@ -1623,7 +1645,8 @@
         this.__addresses = {}
     };
     var BTCMeta = mkm.mkm.BTCMeta;
-    Class(BTCMeta, BaseMeta, null, {
+    Class(BTCMeta, BaseMeta, null);
+    Implementation(BTCMeta, {
         hasSeed: function () {
             return false
         }, generateAddress: function (network) {
@@ -1650,7 +1673,8 @@
         this.__address = null
     };
     var ETHMeta = mkm.mkm.ETHMeta;
-    Class(ETHMeta, BaseMeta, null, {
+    Class(ETHMeta, BaseMeta, null);
+    Implementation(ETHMeta, {
         hasSeed: function () {
             return false
         }, generateAddress: function (network) {
@@ -1669,7 +1693,7 @@
         this.__type = algorithm
     };
     var BaseMetaFactory = mkm.mkm.BaseMetaFactory;
-    Class(BaseMetaFactory, BaseObject, [MetaFactory], null);
+    Class(BaseMetaFactory, BaseObject, [MetaFactory]);
     BaseMetaFactory.prototype.getType = function () {
         return this.__type
     };
@@ -1730,7 +1754,7 @@
         BaseObject.call(this)
     };
     var GeneralCommandFactory = dkd.dkd.GeneralCommandFactory;
-    Class(GeneralCommandFactory, BaseObject, [ContentFactory, CommandFactory], null);
+    Class(GeneralCommandFactory, BaseObject, [ContentFactory, CommandFactory]);
     GeneralCommandFactory.prototype.parseContent = function (content) {
         var helper = SharedCommandExtensions.getHelper();
         var cmdHelper = SharedCommandExtensions.getCommandHelper();
@@ -1756,7 +1780,7 @@
         GeneralCommandFactory.call(this)
     };
     var HistoryCommandFactory = dkd.dkd.HistoryCommandFactory;
-    Class(HistoryCommandFactory, GeneralCommandFactory, null, null);
+    Class(HistoryCommandFactory, GeneralCommandFactory, null);
     HistoryCommandFactory.prototype.parseCommand = function (content) {
         if (!content['sn'] || !content['command'] || !content['time']) {
             return null
@@ -1767,7 +1791,7 @@
         HistoryCommandFactory.call(this)
     };
     var GroupCommandFactory = dkd.dkd.GroupCommandFactory;
-    Class(GroupCommandFactory, HistoryCommandFactory, null, null);
+    Class(GroupCommandFactory, HistoryCommandFactory, null);
     GroupCommandFactory.prototype.parseContent = function (content) {
         var helper = SharedCommandExtensions.getHelper();
         var cmdHelper = SharedCommandExtensions.getCommandHelper();
@@ -1792,7 +1816,7 @@
         this.__sn = random_int(0x7fffffff)
     };
     var MessageFactory = dkd.msg.MessageFactory;
-    Class(MessageFactory, BaseObject, [EnvelopeFactory, InstantMessageFactory, SecureMessageFactory, ReliableMessageFactory], null);
+    Class(MessageFactory, BaseObject, [EnvelopeFactory, InstantMessageFactory, SecureMessageFactory, ReliableMessageFactory]);
     MessageFactory.prototype.next = function () {
         var sn = this.__sn;
         if (sn < 0x7fffffff) {
@@ -1846,7 +1870,7 @@
         this.__publicKeyFactories = {}
     };
     var CryptoKeyGeneralFactory = mk.ext.CryptoKeyGeneralFactory;
-    Class(CryptoKeyGeneralFactory, BaseObject, [GeneralCryptoHelper, SymmetricKeyHelper, PrivateKeyHelper, PublicKeyHelper], null);
+    Class(CryptoKeyGeneralFactory, BaseObject, [GeneralCryptoHelper, SymmetricKeyHelper, PrivateKeyHelper, PublicKeyHelper]);
     CryptoKeyGeneralFactory.prototype.getKeyAlgorithm = function (key, defaultValue) {
         var algorithm = key['algorithm'];
         return Converter.getString(algorithm, defaultValue)
@@ -1949,7 +1973,7 @@
         this.__pnfFactory = null
     };
     var FormatGeneralFactory = mk.ext.FormatGeneralFactory;
-    Class(FormatGeneralFactory, BaseObject, [GeneralFormatHelper, PortableNetworkFileHelper, TransportableDataHelper], null);
+    Class(FormatGeneralFactory, BaseObject, [GeneralFormatHelper, PortableNetworkFileHelper, TransportableDataHelper]);
     FormatGeneralFactory.prototype.split = function (text) {
         var pos1 = text.indexOf('://');
         if (pos1 > 0) {
@@ -2085,7 +2109,7 @@
         this.__docsFactories = {}
     };
     var AccountGeneralFactory = mkm.ext.AccountGeneralFactory;
-    Class(AccountGeneralFactory, BaseObject, [GeneralAccountHelper, AddressHelper, IdentifierHelper, MetaHelper, DocumentHelper], null);
+    Class(AccountGeneralFactory, BaseObject, [GeneralAccountHelper, AddressHelper, IdentifierHelper, MetaHelper, DocumentHelper]);
     AccountGeneralFactory.prototype.getMetaType = function (meta, defaultValue) {
         var type = meta['type'];
         return Converter.getString(type, defaultValue)
@@ -2171,7 +2195,7 @@
         if (!factory) {
             throw new ReferenceError('ID factory not ready');
         }
-        return factory.createIdentifier(meta, network, terminal)
+        return factory.generateIdentifier(meta, network, terminal)
     };
     AccountGeneralFactory.prototype.setMetaFactory = function (type, factory) {
         this.__metaFactories[type] = factory
@@ -2255,7 +2279,7 @@
         this.__reliableMessageFactory = null
     };
     var MessageGeneralFactory = dkd.ext.MessageGeneralFactory
-    Class(MessageGeneralFactory, BaseObject, [GeneralMessageHelper, ContentHelper, EnvelopeHelper, InstantMessageHelper, SecureMessageHelper, ReliableMessageHelper], null);
+    Class(MessageGeneralFactory, BaseObject, [GeneralMessageHelper, ContentHelper, EnvelopeHelper, InstantMessageHelper, SecureMessageHelper, ReliableMessageHelper]);
     MessageGeneralFactory.prototype.getContentType = function (content, defaultValue) {
         var type = content['type'];
         return Converter.getString(type, defaultValue)
@@ -2400,7 +2424,7 @@
         this.__commandFactories = {}
     };
     var CommandGeneralFactory = dkd.ext.CommandGeneralFactory
-    Class(CommandGeneralFactory, BaseObject, [GeneralCommandHelper, CommandHelper], null);
+    Class(CommandGeneralFactory, BaseObject, [GeneralCommandHelper, CommandHelper]);
     CommandGeneralFactory.prototype.getCmd = function (content, defaultValue) {
         var cmd = content['command'];
         return Converter.getString(cmd, defaultValue)
@@ -2451,7 +2475,8 @@
         BaseObject.call(this)
     };
     var ExtensionLoader = dimp.ext.ExtensionLoader;
-    Class(ExtensionLoader, BaseObject, null, {
+    Class(ExtensionLoader, BaseObject, null);
+    Implementation(ExtensionLoader, {
         load: function () {
             this.registerCoreHelpers();
             this.registerMessageFactories();
@@ -2562,7 +2587,7 @@
         this.__class = clazz
     };
     var ContentParser = dkd.dkd.ContentParser;
-    Class(ContentParser, BaseObject, [ContentFactory], null);
+    Class(ContentParser, BaseObject, [ContentFactory]);
     ContentParser.prototype.parseContent = function (content) {
         return new this.__class(content)
     };
@@ -2571,7 +2596,7 @@
         this.__class = clazz
     };
     var CommandParser = dkd.dkd.CommandParser;
-    Class(CommandParser, BaseObject, [CommandFactory], null);
+    Class(CommandParser, BaseObject, [CommandFactory]);
     CommandParser.prototype.parseCommand = function (content) {
         return new this.__class(content)
     };
@@ -2579,7 +2604,8 @@
         BaseObject.call(this)
     };
     var PluginLoader = dimp.ext.PluginLoader;
-    Class(PluginLoader, BaseObject, null, {
+    Class(PluginLoader, BaseObject, null);
+    Implementation(PluginLoader, {
         load: function () {
             this.registerCoders();
             this.registerDigesters();

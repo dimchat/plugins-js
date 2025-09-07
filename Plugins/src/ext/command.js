@@ -45,7 +45,7 @@
     Class(CommandGeneralFactory, BaseObject, [
         GeneralCommandHelper,
         CommandHelper
-    ], null);
+    ]);
 
     // Override
     CommandGeneralFactory.prototype.getCmd = function (content, defaultValue) {

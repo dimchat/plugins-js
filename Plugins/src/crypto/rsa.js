@@ -29,7 +29,7 @@
 //! require <crypto-js/sha256.js>
 //! require <jsencrypt.js> (https://github.com/travist/jsencrypt)
 
-//! require <crypto.js>
+//! require <dimp.js>
 
     var x509_header = new Uint8Array([48, -127, -97, 48, 13, 6, 9, 42, -122, 72, -122, -9, 13, 1, 1, 1, 5, 0, 3, -127, -115, 0]);
     var rsa_public_key = function (der) {
@@ -75,7 +75,9 @@
     };
     var RSAPublicKey = mk.crypto.RSAPublicKey;
 
-    Class(RSAPublicKey, BasePublicKey, [EncryptKey], {
+    Class(RSAPublicKey, BasePublicKey, [EncryptKey]);
+
+    Implementation(RSAPublicKey, {
 
         // Override
         getData: function () {
@@ -158,7 +160,9 @@
     };
     var RSAPrivateKey = mk.crypto.RSAPrivateKey;
 
-    Class(RSAPrivateKey, BasePrivateKey, [DecryptKey], {
+    Class(RSAPrivateKey, BasePrivateKey, [DecryptKey]);
+
+    Implementation(RSAPrivateKey, {
 
         // Override
         getData: function () {
@@ -253,7 +257,7 @@
     };
     var RSAPrivateKeyFactory = mk.crypto.RSAPrivateKeyFactory;
 
-    Class(RSAPrivateKeyFactory, BaseObject, [PrivateKeyFactory], null);
+    Class(RSAPrivateKeyFactory, BaseObject, [PrivateKeyFactory]);
 
     // Override
     RSAPrivateKeyFactory.prototype.generatePrivateKey = function() {
@@ -281,7 +285,7 @@
     };
     var RSAPublicKeyFactory = mk.crypto.RSAPublicKeyFactory;
 
-    Class(RSAPublicKeyFactory, BaseObject, [PublicKeyFactory], null);
+    Class(RSAPublicKeyFactory, BaseObject, [PublicKeyFactory]);
 
     // Override
     RSAPublicKeyFactory.prototype.parsePublicKey = function(key) {

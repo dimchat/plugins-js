@@ -42,7 +42,7 @@
     };
     var GeneralDocumentFactory = mkm.mkm.GeneralDocumentFactory;
 
-    Class(GeneralDocumentFactory, BaseObject, [DocumentFactory], null);
+    Class(GeneralDocumentFactory, BaseObject, [DocumentFactory]);
 
     // protected
     GeneralDocumentFactory.prototype.getType = function (docType, identifier) {

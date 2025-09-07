@@ -41,7 +41,9 @@
     };
     var PluginLoader = dimp.ext.PluginLoader;
 
-    Class(PluginLoader, BaseObject, null, {
+    Class(PluginLoader, BaseObject, null);
+
+    Implementation(PluginLoader, {
 
         /**
          *  Register plugins

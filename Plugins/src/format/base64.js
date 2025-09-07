@@ -152,7 +152,9 @@
     };
     var Base64Coder = mk.format.Base64Coder;
 
-    Class(Base64Coder, BaseObject, [DataCoder], {
+    Class(Base64Coder, BaseObject, [DataCoder]);
+
+    Implementation(Base64Coder, {
 
         // Override
         encode: function (data) {

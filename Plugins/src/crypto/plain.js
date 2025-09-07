@@ -41,7 +41,9 @@
     };
     var PlainKey = mk.crypto.PlainKey;
 
-    Class(PlainKey, BaseSymmetricKey, null, {
+    Class(PlainKey, BaseSymmetricKey, null);
+
+    Implementation(PlainKey, {
 
         // Override
         getData: function () {
@@ -80,7 +82,7 @@
     };
     var PlainKeyFactory = mk.crypto.PlainKeyFactory;
 
-    Class(PlainKeyFactory, BaseObject, [SymmetricKeyFactory], null);
+    Class(PlainKeyFactory, BaseObject, [SymmetricKeyFactory]);
 
     // Override
     PlainKeyFactory.prototype.generateSymmetricKey = function() {

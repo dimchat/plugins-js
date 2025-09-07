@@ -41,7 +41,9 @@
     };
     var ExtensionLoader = dimp.ext.ExtensionLoader;
 
-    Class(ExtensionLoader, BaseObject, null, {
+    Class(ExtensionLoader, BaseObject, null);
+
+    Implementation(ExtensionLoader, {
 
         /**
          *  Register core factories
@@ -272,7 +274,7 @@
     };
     var ContentParser = dkd.dkd.ContentParser;
 
-    Class(ContentParser, BaseObject, [ContentFactory], null);
+    Class(ContentParser, BaseObject, [ContentFactory]);
 
     // Override
     ContentParser.prototype.parseContent = function (content) {
@@ -289,7 +291,7 @@
     };
     var CommandParser = dkd.dkd.CommandParser;
 
-    Class(CommandParser, BaseObject, [CommandFactory], null);
+    Class(CommandParser, BaseObject, [CommandFactory]);
 
     // Override
     CommandParser.prototype.parseCommand = function (content) {

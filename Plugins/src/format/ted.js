@@ -55,7 +55,9 @@
     };
     var Base64Data = mk.format.Base64Data;
 
-    Class(Base64Data, Dictionary, [TransportableData], {
+    Class(Base64Data, Dictionary, [TransportableData]);
+
+    Implementation(Base64Data, {
 
         // Override
         getAlgorithm: function () {
@@ -93,7 +95,9 @@
     };
     var Base64DataFactory = mk.format.Base64DataFactory;
 
-    Class(Base64DataFactory, BaseObject, [TransportableDataFactory], {
+    Class(Base64DataFactory, BaseObject, [TransportableDataFactory]);
+
+    Implementation(Base64DataFactory, {
         
         // Override
         createTransportableData: function (data) {

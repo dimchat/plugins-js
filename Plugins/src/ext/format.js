@@ -42,7 +42,7 @@
         GeneralFormatHelper,
         PortableNetworkFileHelper,
         TransportableDataHelper
-    ], null);
+    ]);
 
     /**
      *  Split text string to array: ["{TEXT}", "{algorithm}", "{content-type}"]

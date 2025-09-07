@@ -28,7 +28,7 @@
 //! require <bn.js> (https://unpkg.com/bn.js@4.11.8/lib/bn.js)
 //! require <secp256k1.js> (https://unpkg.com/@enumatech/secp256k1-js@1.0.0/src/secp256k1.js)
 
-//! require <crypto.js>
+//! require <dimp.js>
 
     // var mem_set = function (buf, ch, len) {
     //     for (var i = 0; i < len; ++i) {
@@ -246,7 +246,9 @@
     };
     var ECCPublicKey = mk.crypto.ECCPublicKey;
 
-    Class(ECCPublicKey, BasePublicKey, null, {
+    Class(ECCPublicKey, BasePublicKey, null);
+
+    Implementation(ECCPublicKey, {
 
         // Override
         getData: function () {
@@ -319,7 +321,9 @@
     };
     var ECCPrivateKey = mk.crypto.ECCPrivateKey;
 
-    Class(ECCPrivateKey, BasePrivateKey, null, {
+    Class(ECCPrivateKey, BasePrivateKey, null);
+
+    Implementation(ECCPrivateKey, {
 
         // Override
         getData: function () {
@@ -398,7 +402,7 @@
     };
     var ECCPrivateKeyFactory = mk.crypto.ECCPrivateKeyFactory;
 
-    Class(ECCPrivateKeyFactory, BaseObject, [PrivateKeyFactory], null);
+    Class(ECCPrivateKeyFactory, BaseObject, [PrivateKeyFactory]);
 
     // Override
     ECCPrivateKeyFactory.prototype.generatePrivateKey = function() {
@@ -426,7 +430,7 @@
     };
     var ECCPublicKeyFactory = mk.crypto.ECCPublicKeyFactory;
 
-    Class(ECCPublicKeyFactory, BaseObject, [PublicKeyFactory], null);
+    Class(ECCPublicKeyFactory, BaseObject, [PublicKeyFactory]);
 
     // Override
     ECCPublicKeyFactory.prototype.parsePublicKey = function(key) {

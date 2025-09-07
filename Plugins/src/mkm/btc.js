@@ -52,7 +52,9 @@
     };
     var BTCAddress = mkm.mkm.BTCAddress;
 
-    Class(BTCAddress, ConstantString, [Address], {
+    Class(BTCAddress, ConstantString, [Address]);
+
+    Implementation(BTCAddress, {
 
         // Override
         getType: function () {

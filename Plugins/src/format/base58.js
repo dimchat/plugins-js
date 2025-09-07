@@ -187,7 +187,9 @@
     };
     var Base58Coder = mk.format.Base58Coder;
 
-    Class(Base58Coder, BaseObject, [DataCoder], {
+    Class(Base58Coder, BaseObject, [DataCoder]);
+
+    Implementation(Base58Coder, {
 
         // Override
         encode: function (data) {
